@@ -18,9 +18,12 @@ public class UserService {
     public List<UserDto> findAll() {
         System.out.println("-----------------여기 도착--------------");
         List<UserDto> res = userMapper.findAll();
+
+        System.out.println(res);
+
         System.out.println("디버깅");
         for (UserDto temp : res) {
-            System.out.println(temp.getName());
+            System.out.println(temp.getUserId());
         }
         System.out.println("디버깅 끝");
 
