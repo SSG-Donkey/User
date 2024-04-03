@@ -1,27 +1,12 @@
 package com.project.backend.dto;
 
-import org.springframework.data.relational.core.mapping.Column;
-
 public class UserDto {
-    @Column(value = "user_no")
     private String userNo;
-
-    @Column(value = "user_id")
     private String userId;
-
-    @Column(value = "user_password")
     private String userPassword;
-
-    @Column(value = "user_nickname")
     private String userNickname;
-
-    @Column(value = "user_email")
     private String userEmail;
-
-    @Column(value = "bank_no")
     private String bankNo;
-
-    @Column(value = "user_account")
     private String userAccount;
 
     public String getUserNo() {
