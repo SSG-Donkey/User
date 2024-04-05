@@ -1,34 +1,42 @@
 package com.project.backend.controller;
 
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.project.backend.dto.LoginRequestDto;
+import com.project.backend.dto.ResponseMsgDto;
+import com.project.backend.dto.SignupRequestDto;
+import com.project.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.backend.dto.UserDto;
-import com.project.backend.service.UserService;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
-
+@Tag(name = "userController", description = "회원가입/로그인 API")
 @RestController
-@RequestMapping("/api")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/hello")
-    public String hello1() {
-        return "hello";
+    @Operation(summary = "회원가입 API", description = "회원가입")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 가입 완료")})
+    //회원가입
+    @PostMapping(value = "/signup")
+    public ResponseMsgDto signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+        return userService.signup(signupRequestDto);
     }
 
-    @GetMapping("/getUsers")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    @Operation(summary = "로그인 API", description = "로그인 성공시 jwt 토큰을 헤더에 넣어 반환합니다.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "로그인 완료")})
+    //로그인
+    @PostMapping("/login")
+    public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
+        return userService.login(loginRequestDto, response);
     }
 }
