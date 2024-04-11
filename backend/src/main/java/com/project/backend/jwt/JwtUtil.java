@@ -4,9 +4,10 @@ import com.project.backend.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,10 +23,10 @@ import java.util.Date;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtUtil {
 
-    private final UserDetailsService userDetailsService;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String AUTHORIZATION_KEY = "auth";
@@ -54,16 +55,15 @@ public class JwtUtil {
 
     // 토큰 생성
     public String createToken(String username, UserRoleEnum role) {
-        Date date = new Date();
+        Date now = new Date();
 
-        return BEARER_PREFIX +
-                Jwts.builder()
-                        .setSubject(username)
-                        .claim(AUTHORIZATION_KEY, role)
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME))
-                        .setIssuedAt(date)
-                        .signWith(key, signatureAlgorithm)
-                        .compact();
+        return Jwts.builder()
+                .setSubject(username)
+                .claim(AUTHORIZATION_KEY, role)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_TIME))
+                .signWith(key, signatureAlgorithm)
+                .compact();
     }
 
     // 토큰 검증
@@ -90,8 +90,12 @@ public class JwtUtil {
 
     // 인증 객체 생성
     public Authentication createAuthentication(String username) {
+        UserDetailsService userDetailsService = getUserDetailsService();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
+    private UserDetailsService getUserDetailsService() {
+        return applicationContext.getBean(UserDetailsService.class);
+    }
 }

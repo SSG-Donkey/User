@@ -1,4 +1,4 @@
-package com.project.backend.utils;
+package com.project.backend.config;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
