@@ -19,21 +19,22 @@ public class UserDetailsImpl implements UserDetails {
         this.username = username;
     }
 
-    public User getUser() {
-        return user;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        UserRoleEnum role = user.getRole();
-        String authority = role.getAuthority();
+        // user.getRole() 호출 전에 null 체크 수행
+        if (user.getRole() == null) {
+            throw new IllegalArgumentException("User role cannot be null");
+        }
 
+        String authority = user.getRole().getAuthority();
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);
 
         return authorities;
     }
+
 
     @Override
     public String getUsername() {

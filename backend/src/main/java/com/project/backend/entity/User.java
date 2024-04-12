@@ -4,51 +4,77 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
-@Entity(name = "users")
+@Entity(name = "user")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "user_no")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(name = "user_password", nullable = false)
     @JsonIgnore
     private String password;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_nickname", nullable = false, unique = true)
     private String nickname;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_email", nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "bank_no", nullable = false)
     @JsonIgnore
     private Long bankNo;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_account", nullable = false, unique = true)
     private Long account;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING) // 문자열 형태로 Enum을 저장
+    @Column(name = "user_role")
     private UserRoleEnum role;
 
-      public User(String nickname, String username, String password, String email, Long bankNo, Long account) {
+
+    // 생성자에서 role 파라미터를 제외하고 기본값을 설정
+    public User(String nickname, String username, String password, String email, Long bankNo, Long account) {
         this.nickname = nickname;
         this.username = username;
         this.password = password;
         this.email = email;
         this.bankNo = bankNo;
         this.account = account;
-        this.role = UserRoleEnum.USER;
+        this.role = UserRoleEnum.USER; // 기본 권한을 USER로 설정
+    }
+
+    // BankNo 설정
+    public void setBankNo(Long bankNo) {
+        this.bankNo = bankNo;
+    }
+
+    // Nickname 설정
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    // Password 설정
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // Role 설정
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
+    // Role 가져오기
+    public UserRoleEnum getRole() {
+        return role;
     }
 }

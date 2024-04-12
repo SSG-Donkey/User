@@ -1,18 +1,14 @@
 package com.project.backend.controller;
 
 
-import com.project.backend.dto.LoginRequestDto;
-import com.project.backend.dto.ResponseMsgDto;
-import com.project.backend.dto.SignupRequestDto;
+import com.project.backend.dto.*;
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -38,5 +34,24 @@ public class UserController {
     @PostMapping("/login")
     public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return userService.login(loginRequestDto, response);
+    }
+
+    //회원정보 수정
+    @Operation(summary = "회원 정보 업데이트 API", description = "사용자의 닉네임, 비밀번호, 및 은행 정보를 업데이트합니다.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 정보 업데이트 완료")})
+    @PutMapping("/user/{userId}/updateInfo")
+    public ResponseMsgDto updateUserInfo(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserInfoRequestDto updateUserInfoRequestDto) {
+        return userService.updateUserInfo(userId, updateUserInfoRequestDto);
+    }
+
+    //회원탈퇴
+
+    @Operation(summary = "회원 탈퇴 API", description = "사용자의 계정을 삭제합니다.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 탈퇴 완료")})
+    @DeleteMapping("/user/{userId}")
+    public ResponseMsgDto deleteUser(@PathVariable Long userId) {
+        return userService.deleteUser(userId);
     }
 }
