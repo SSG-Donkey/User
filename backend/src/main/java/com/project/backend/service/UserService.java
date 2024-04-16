@@ -107,7 +107,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        // 닉네임이 제공되었는지 확인하고, 중복되는지 검사
+        // 닉네임 업데이트
         if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname())) {
             userRepository.findByNickname(updateUserInfoRequestDto.getNickname()).ifPresent(u -> {
                 throw new CustomException(EXIST_NICKNAME);
@@ -115,7 +115,7 @@ public class UserService {
             user.setNickname(updateUserInfoRequestDto.getNickname());
         }
 
-        // 비밀번호 유효성 검사 및 업데이트
+        // 비밀번호 업데이트
         if (StringUtils.isNotBlank(updateUserInfoRequestDto.getPassword())) {
             if (!Pattern.matches("(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).*$", updateUserInfoRequestDto.getPassword())) {
                 throw new CustomException(INVALID_PASSWORD_FORMAT);
@@ -123,13 +123,18 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(updateUserInfoRequestDto.getPassword()));
         }
 
-        // 새 은행 번호가 제공되었는지 확인하고 업데이트
+        // 은행 번호 업데이트
         if (updateUserInfoRequestDto.getNewBankNo() != null) {
             Bank newBank = bankService.getBankByNo(updateUserInfoRequestDto.getNewBankNo());
             if (newBank == null) {
                 throw new CustomException(NOT_FOUND_BANK);
             }
             user.setBankNo(newBank.getBankNo());
+        }
+
+        // 계좌 번호 업데이트
+        if (updateUserInfoRequestDto.getNewAccount() != null) {
+            user.setAccount(updateUserInfoRequestDto.getNewAccount());
         }
 
         userRepository.save(user);

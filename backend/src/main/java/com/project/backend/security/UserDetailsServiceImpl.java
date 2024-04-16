@@ -10,16 +10,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-//사용자 인증 처리 클래스
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        // 사용자를 찾는 로직. 여기서는 email을 username으로 사용한다고 가정.
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
-        return new UserDetailsImpl(user, user.getUsername());
+        // PrincipalDetails 객체를 생성하여 반환. 여기서는 OAuth2 속성은 사용하지 않으므로 첫 번째 생성자를 사용.
+        return new PrincipalDetails(user);
     }
 }

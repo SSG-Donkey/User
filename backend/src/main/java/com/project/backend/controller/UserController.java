@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-@Tag(name = "userController", description = "회원가입/로그인 API")
+@Tag(name = "userController", description = "유저관리 API")
 @RestController
 @RequiredArgsConstructor
 public class UserController {

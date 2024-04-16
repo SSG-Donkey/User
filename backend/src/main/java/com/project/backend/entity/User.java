@@ -30,11 +30,11 @@ public class User {
     @Column(name = "user_email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "bank_no", nullable = false)
+    @Column(name = "bank_no", nullable = true)
     @JsonIgnore
     private Long bankNo;
 
-    @Column(name = "user_account", nullable = false, unique = true)
+    @Column(name = "user_account", nullable = true, unique = true)
     private Long account;
 
     @Enumerated(EnumType.STRING) // 문자열 형태로 Enum을 저장
@@ -66,6 +66,10 @@ public class User {
     // Password 설정
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setAccount(Long account) {
+        this.account = account;
     }
 
     // Role 설정
