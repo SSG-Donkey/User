@@ -1,62 +1,64 @@
 name: Build and Deploy Spring Boot Application
 
-# 이 워크플로우는 main 브랜치에 push 이벤트가 발생할 때 트리거됩니다.
 on:
   push:
     branches: [ main ]
 
-# 작업 정의
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest  # 가장 최신의 Ubuntu 러너에서 작업을 실행합니다.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2  # 현재 GitHub 리포지토리에서 코드를 체크아웃합니다.
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17 with Zulu
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'zulu'  # Zulu OpenJDK를 사용합니다.
+          distribution: 'zulu'
+
+      - name: Set executable permission for gradlew
+        run: chmod +x ./gradlew
+        working-directory: ./backend
 
       - name: Build with Gradle
-        run: ./gradlew build  # Gradle Wrapper를 사용하여 애플리케이션을 빌드합니다.
-        working-directory: ./backend  # 'backend' 디렉토리에서 빌드 명령을 실행합니다.
+        run: ./gradlew build
+        working-directory: ./backend
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1  # AWS 자격증명을 설정합니다.
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS 액세스 키 ID
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS 시크릿 액세스 키
-          aws-region: ${{ secrets.AWS_REGION }}  # AWS 리전 설정
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1  # Amazon ECR에 로그인합니다.
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
           docker build -f ./backend/Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }} ./backend
           docker push ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
-        working-directory: ./backend  # 'backend' 디렉토리에서 Docker 빌드 및 푸시 명령을 실행합니다.
+        working-directory: ./backend
 
       - name: Setup Kustomize
-        uses: imranismail/setup-kustomize@v1  # Kustomize를 설치합니다. Kubernetes 매니페스트를 관리하는 도구입니다.
+        uses: imranismail/setup-kustomize@v1
 
       - name: Checkout kustomize repository
-        uses: actions/checkout@v2  # 별도의 리포지토리에서 k8s 매니페스트를 체크아웃합니다.
+        uses: actions/checkout@v2
         with:
-          repository: SSG-Donkey/k8s-manifest-repo-  # 조직의 k8s 매니페스트 리포지토리
+          repository: SSG-Donkey/k8s-manifest-repo
           ref: main
-          token: ${{ secrets.ACTION_TOKEN }}  # GitHub 액세스 토큰
+          token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
       - name: Update Kubernetes resources
         run: |
           cd k8s-manifest-repo/overlays/dev/
-          kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
+          kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
           cat kustomization.yaml
-        working-directory: ./k8s-manifest-repo/overlays/dev  # 'k8s-manifest-repo/overlays/dev' 디렉토리에서 kustomize 명령을 실행합니다.
+        working-directory: ./k8s-manifest-repo/overlays/dev
 
       - name: Commit files
         run: |
@@ -65,4 +67,4 @@ jobs:
           git config --global user.name "GitHub Actions"
           git commit -am "Update image tag for donkey-app"
           git push -u origin main
-        working-directory: ./k8s-manifest-repo  # 'k8s-manifest-repo' 디렉토리에서 커밋 및 푸시 명령을 실행합니다.
+        working-directory: ./k8s-manifest-repo
