@@ -20,10 +20,7 @@ jobs:
 
       - name: Set executable permission for gradlew
         run: chmod +x ./gradlew
-        working-directory: ./backend
-
-      - name: View application-common.yml
-        run: cat ./src/main/resources/application.yml
+        working-directory: ./backend   
       - name: 프로젝트 빌드
         run: ./gradlew clean build -x test        
 
