@@ -26,8 +26,8 @@ jobs:
         run: cat ./src/main/resources/application.yml
         working-directory: ./backend
 
-      - name: Build without tests
-        run: ./gradlew assemble
+      - name: Build with Gradle
+        run: ./gradlew build
         working-directory: ./backend   
 
       - name: Set Jasypt Encryptor Password
