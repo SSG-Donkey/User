@@ -22,6 +22,10 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: ./backend
 
+      - name: View application.yml
+        run: cat ./src/main/resources/application.yml
+        working-directory: ./backend
+
       - name: Build without tests
         run: ./gradlew assemble
         working-directory: ./backend   
