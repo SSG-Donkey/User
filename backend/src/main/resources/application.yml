@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url: ENC(1qYHM+UipK83Gac3az7h8JuzRc4KDSZbw21/fViNYXLIQ0qkAk+Li6LNNjkKxB3wDeI6mSjkhhTmSwhDjnMIkphEDgVEt+86nBFciy1xNo2xwYYm71v/PIveZW/xWwvN)
+    username: ENC(26ZMFzw7eKTUDEFDUwD2Sg==)
+    password: ENC(jxh6IIJryl+zr6+jMZn4DgSyhYPxbQSh)
+  jasypt:
+    encryptor:
+      bean: jasyptStringEncryptor
+      algorithm: PBEWithMD5AndDES
+      iv-generator-classname: org.jasypt.iv.NoIvGenerator
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 842324597397-7rifslt6crb8im7vmnpmo7icef9q7spp.apps.googleusercontent.com
+            client-secret: ENC(m+dlS+tCUXRU9W68SmWn3yh95Qp6P+NG5fRhDuR1RenSWqjcUrlqijMZghPPFNcY)
+            scope: profile, email
+
+mybatis:
+  mapper-locations: classpath:/mappers/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  secret:
+    key: ENC(O0qNwaK41d4Wp22hne0XiRezVUCoclSxVVFUG6lhkEm3jPT7GqX5NOiLkOBDoGQPZDHeLtE8A2bXQZMkZgUKWCGdRx2xk+ylat+T8/ypMSYhdFwCNWD7FK6SdX2QNEtaRodFR/l3ibbiGFNmj0ZP66DRSY+TmMze1OCnNxbtCRgCo049qAcL1g==)
