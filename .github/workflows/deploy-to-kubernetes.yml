@@ -23,7 +23,7 @@ jobs:
         working-directory: ./backend
 
       - name: View application-common.yml
-        run: cat ./src/main/resources/application.properties
+        run: cat ./src/main/resources/application.yml
       - name: 프로젝트 빌드
         run: ./gradlew clean build -x test        
 
