@@ -3,7 +3,7 @@ spring:
     name: backend
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
-    url: ENC(1qYHM+UipK83Gac3az7h8JuzRc4KDSZbw21/fViNYXLIQ0qkAk+Li6LNNjkKxB3wDeI6mSjkhhTmSwhDjnMIkphEDgVEt+86nBFciy1xNo2xwYYm71v/PIveZW/xWwvN)
+    url: ENC(4kGfNJtsELjmDDnHJqmPdsAkD0CF6BDN2fp5FZ1FvTnxkFR8pBQ6buOqygDN1doJyBMUmr8HWQ9GB/yuahJlqnJwc/eOt019N9dzjzZkM2U7naEmc0/VURQAORCK/sNJjkJcwLx7kYE=)
     username: ENC(26ZMFzw7eKTUDEFDUwD2Sg==)
     password: ENC(jxh6IIJryl+zr6+jMZn4DgSyhYPxbQSh)
   jasypt:
