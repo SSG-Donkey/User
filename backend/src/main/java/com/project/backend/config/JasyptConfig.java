@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 public class JasyptConfig {
 
-    @Value("${jasypt.encryptor.password}")
+    @Value("218905C7CD2C857E34E95E8FB59C0DDE3DCBFB97")
     private String PASSWORD_KEY;
 
     private static final String ALGORITHM = "PBEWithMD5AndDES";
