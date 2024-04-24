@@ -10,7 +10,7 @@ import java.util.List;
 
 @Tag(name = "bankController", description = "은행 관련 API")
 @RestController
-@RequestMapping("/bank")
+@RequestMapping("/user")
 public class BankController {
 
     private final BankService bankService;
