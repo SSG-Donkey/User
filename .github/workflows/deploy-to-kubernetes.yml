@@ -40,12 +40,17 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-     
+
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
-          docker build -f Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/donkey-user:User${{ github.run_number }} .
-          docker push ${{ steps.login-ecr.outputs.registry }}/donkey-user:User${{ github.run_number }}
-        working-directory: ./backend        
+          TAG_NAME=$(date +'%Y%m%d%H%M%S')
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/donkey-user:$TAG_NAME
+          docker build -f Dockerfile -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+        working-directory: ./backend
+        env:
+          TZ: Asia/Seoul
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
@@ -58,17 +63,18 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
-      - name: Update Kubernetes resources
+      - name: Update Kubernetes resources with new image tag
         run: |
-          kustomize edit set image donkey-user=${{ steps.login-ecr.outputs.registry }}/donkey-user:${{ github.sha }}
-          cat kustomization.yaml
-        working-directory: ./k8s-manifest-repo/overlays/dev
+          cd ${{ github.workspace }}/k8s-manifest-repo/base
+          kustomize edit set image donkey-user=$IMAGE_URI
+        env:
+          IMAGE_URI: ${{ env.IMAGE_URI }}
 
-      - name: Commit files
+      - name: Commit and push the updated kustomization
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
+          cd ${{ github.workspace }}/k8s-manifest-repo
           git add .
-          git commit -m "Update image tag for donkey-user"
+          git commit -m "Update image tag for donkey-user to $IMAGE_URI"
           git push
-        working-directory: ./k8s-manifest-repo
+        env:
+          IMAGE_URI: ${{ env.IMAGE_URI }}
