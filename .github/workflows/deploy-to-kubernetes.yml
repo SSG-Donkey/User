@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-
+      
       - name: Set up JDK 17 with Zulu
         uses: actions/setup-java@v2
         with:
@@ -71,7 +71,8 @@ jobs:
 
       - name: Update user-deployment.yaml with new image URI and tag
         run: |
-          sed -i "s|227250033304.dkr.ecr.ap-northeast-2.amazonaws.com/donkey-user:.*|$IMAGE_URI|" ./base/user-deployment.yaml
+          sed -i "s|image: .*|image: $IMAGE_URI|" ./base/user-deployment.yaml
+          cat ./base/user-deployment.yaml # For debugging purposes
         working-directory: ${{ github.workspace }}/k8s-manifest-repo
         env:
           IMAGE_URI: ${{ env.IMAGE_URI }}
