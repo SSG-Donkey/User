@@ -2,8 +2,10 @@ package com.project.backend.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/oath2")
 public class OAuthController {
     @GetMapping("/loginForm")
     public String home() {
