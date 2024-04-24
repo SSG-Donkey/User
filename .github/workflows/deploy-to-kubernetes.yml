@@ -63,24 +63,24 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
-      - name: Update user-deployment.yaml with new image tag
-        run: |
-          sed -i "s|donkey-user:.*|donkey-user:${{ env.TAG_NAME }}|" ./base/user-deployment.yaml
-        working-directory: ${{ github.workspace }}/k8s-manifest-repo
-        env:
-          TAG_NAME: ${{ env.TAG_NAME }}
-
       - name: Setup Git identity
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
         working-directory: ${{ github.workspace }}/k8s-manifest-repo
 
+      - name: Update user-deployment.yaml with new image URI and tag
+        run: |
+          sed -i "s|227250033304.dkr.ecr.ap-northeast-2.amazonaws.com/donkey-user:.*|$IMAGE_URI|" ./base/user-deployment.yaml
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
+        env:
+          IMAGE_URI: ${{ env.IMAGE_URI }}
+
       - name: Commit and push the updated user-deployment.yaml
         run: |
           git add base/user-deployment.yaml
-          git commit -m "Update image tag for donkey-user to ${{ env.TAG_NAME }}"
+          git commit -m "Update image URI for donkey-user to $IMAGE_URI"
           git push
         working-directory: ${{ github.workspace }}/k8s-manifest-repo
         env:
-          TAG_NAME: ${{ env.TAG_NAME }}
+          IMAGE_URI: ${{ env.IMAGE_URI }}
