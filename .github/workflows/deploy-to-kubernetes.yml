@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-
+      
       - name: Set up JDK 17 with Zulu
         uses: actions/setup-java@v2
         with:
@@ -43,9 +43,14 @@ jobs:
 
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
-          docker build -f Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }} .
-          docker push ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
+          TAG_NAME=$(date +'%Y%m%d%H%M%S')
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/donkey-user:$TAG_NAME
+          docker build -f Dockerfile -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
         working-directory: ./backend
+        env:
+          TZ: Asia/Seoul
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
@@ -58,17 +63,25 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
-      - name: Update Kubernetes resources
+      - name: Setup Git identity
         run: |
-          kustomize edit set image donkey-app=${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
-          cat kustomization.yaml
-        working-directory: ./k8s-manifest-repo/overlays/dev
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
 
-      - name: Commit files
+      - name: Update user-deployment.yaml with new image URI and tag
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add .
-          git commit -m "Update image tag for donkey-app"
+          sed -i "s|image: .*|image: $IMAGE_URI|" ./base/user-deployment.yaml
+          cat ./base/user-deployment.yaml # For debugging purposes
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
+        env:
+          IMAGE_URI: ${{ env.IMAGE_URI }}
+
+      - name: Commit and push the updated user-deployment.yaml
+        run: |
+          git add base/user-deployment.yaml
+          git commit -m "Update image URI for donkey-user to $IMAGE_URI"
           git push
-        working-directory: ./k8s-manifest-repo
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
+        env:
+          IMAGE_URI: ${{ env.IMAGE_URI }}
