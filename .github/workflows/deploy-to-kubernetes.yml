@@ -63,18 +63,24 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
+      - name: Setup Git identity
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
+
       - name: Update Kubernetes resources with new image tag
         run: |
-          cd ${{ github.workspace }}/k8s-manifest-repo/base
           kustomize edit set image donkey-user=$IMAGE_URI
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo/base
         env:
           IMAGE_URI: ${{ env.IMAGE_URI }}
 
-      - name: Commit and push the updated kustomization
+      - name: Commit and push the updated manifest
         run: |
-          cd ${{ github.workspace }}/k8s-manifest-repo
           git add .
           git commit -m "Update image tag for donkey-user to $IMAGE_URI"
           git push
+        working-directory: ${{ github.workspace }}/k8s-manifest-repo
         env:
           IMAGE_URI: ${{ env.IMAGE_URI }}
