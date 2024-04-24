@@ -40,12 +40,12 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
+     
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
-          docker build -f Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }} .
-          docker push ${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
-        working-directory: ./backend
+          docker build -f Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/donkey-user:User${{ github.run_number }} .
+          docker push ${{ steps.login-ecr.outputs.registry }}/donkey-user:User${{ github.run_number }}
+        working-directory: ./backend        
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
@@ -60,7 +60,7 @@ jobs:
 
       - name: Update Kubernetes resources
         run: |
-          kustomize edit set image donkey-app=${{ steps.login-ecr.outputs.registry }}/donkey-app:${{ github.sha }}
+          kustomize edit set image donkey-user=${{ steps.login-ecr.outputs.registry }}/donkey-user:${{ github.sha }}
           cat kustomization.yaml
         working-directory: ./k8s-manifest-repo/overlays/dev
 
@@ -69,6 +69,6 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Update image tag for donkey-app"
+          git commit -m "Update image tag for donkey-user"
           git push
         working-directory: ./k8s-manifest-repo
