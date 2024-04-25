@@ -22,7 +22,6 @@ public class JasyptConfig {
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
-        System.out.println("Jasypt Key: " + PASSWORD_KEY); // 로그 출력 추가
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(PASSWORD_KEY); // 암호화할 때 사용하는 키
