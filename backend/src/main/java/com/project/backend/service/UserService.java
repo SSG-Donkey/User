@@ -88,6 +88,10 @@ public class UserService {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
+        // 로그인 시도하는 사용자 이름을 로그에 출력
+        System.out.println("Attempting to find user with username: " + username);
+        System.out.println("Attempting to find user with password: " + password);
+
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
