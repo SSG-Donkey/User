@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Log
 public class UserController {
 
     private final UserService userService;
@@ -26,6 +28,9 @@ public class UserController {
     //회원가입
     @PostMapping(value = "/signup")
     public ResponseMsgDto signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+
+        log.info(signupRequestDto.toString());
+
         return userService.signup(signupRequestDto);
     }
 

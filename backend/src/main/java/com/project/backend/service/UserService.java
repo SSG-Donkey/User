@@ -55,20 +55,25 @@ public class UserService {
             throw new CustomException(EXIST_USEREMAIL);
         });
 
-
         // 비밀번호 암호화 저장
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
 
         Long bankNo = signupRequestDto.getBankNo();
-        Long account = signupRequestDto.getAccount();
-
-
 
         // bankNo를 이용하여 bankName 조회
         Bank bank = bankService.getBankByNo(bankNo);
         if (bank == null) {
             throw new CustomException(NOT_FOUND_BANK); // 은행 정보가 조회되지 않을 경우 예외 처리
         }
+
+        Long account = signupRequestDto.getAccount();
+        userRepository.findByAccount(account).ifPresent(u -> {
+            throw new CustomException(EXIST_USERACCOUNT);
+        });
+
+
+
+
 
         // 유저 객체 생성
         User user = new User(nickname, username, password, email, bankNo, account);

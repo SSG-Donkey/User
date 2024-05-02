@@ -21,7 +21,7 @@ public class SignupRequestDto {
     private String password;
 
     @Size(min = 2, max = 10,message = "[닉네임은 2글자~10자 사이로 입력해주세요]")
-    @Pattern(regexp = "^[a-zA-Z가-힣]*$",message = "[닉네임은 알파벳 또는 한글의 형태로 입력해주세요]")
+    @Pattern(regexp = "^[a-zA-Z가-힣0-9]*$", message = "[닉네임은 알파벳, 한글 또는 숫자의 형태로 입력해주세요]")
     @NotBlank
     private String nickname;
 
