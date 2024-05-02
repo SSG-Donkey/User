@@ -71,10 +71,6 @@ public class UserService {
             throw new CustomException(EXIST_USERACCOUNT);
         });
 
-
-
-
-
         // 유저 객체 생성
         User user = new User(nickname, username, password, email, bankNo, account);
 
