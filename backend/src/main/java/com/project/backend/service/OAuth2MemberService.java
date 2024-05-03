@@ -35,7 +35,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         // 사용자 정보를 처리하고, 필요한 경우 추가적인 작업을 수행합니다.
         // 예를 들어, PrincipalDetails 객체를 생성하여 반환할 수 있습니다.
 
-        return oAuth2User;
+        return super.loadUser(userRequest);
     }
 
     private User createUser(String email, Map<String, Object> attributes) {

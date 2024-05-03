@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.project.backend.exception.ErrorCode.*;
@@ -84,26 +86,59 @@ public class UserService {
 
 
     // 로그인
+//    @Transactional
+//    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+//        String username = loginRequestDto.getUsername();
+//        String password = loginRequestDto.getPassword();
+//
+//        // 로그인 시도하는 사용자 이름을 로그에 출력
+//        System.out.println("Attempting to find user with username: " + username);
+//        System.out.println("Attempting to find user with password: " + password);
+//
+//        User user = userRepository.findByUsername(username).orElseThrow(
+//                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+//
+//        if(!passwordEncoder.matches(password, user.getPassword())){
+//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+//        }
+//        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+//
+//        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", token);
+//    }
+
+
+    // 로그인
     @Transactional
     public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
-        // 로그인 시도하는 사용자 이름을 로그에 출력
-        System.out.println("Attempting to find user with username: " + username);
-        System.out.println("Attempting to find user with password: " + password);
-
+        // 사용자 찾기
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        if(!passwordEncoder.matches(password, user.getPassword())){
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", token);
+        // JWT 토큰 생성
+        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
+
+        // 응답 데이터에 닉네임 추가
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("nickname", user.getNickname());
+        data.put("password", user.getPassword());
+        data.put("email", user.getEmail());
+        data.put("bankNo", user.getBankNo());
+        data.put("userId", user.getId());
+
+        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
     }
+
 
 
     //회원정보 수정
@@ -113,9 +148,11 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         // 닉네임 업데이트
-        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname())) {
+        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname()) && !user.getNickname().equals(updateUserInfoRequestDto.getNickname())) {
             userRepository.findByNickname(updateUserInfoRequestDto.getNickname()).ifPresent(u -> {
-                throw new CustomException(EXIST_NICKNAME);
+                if (!u.getId().equals(userId)) { // 같은 ID가 아닐 경우에만 예외 처리
+                    throw new CustomException(ErrorCode.EXIST_NICKNAME);
+                }
             });
             user.setNickname(updateUserInfoRequestDto.getNickname());
         }
@@ -135,6 +172,16 @@ public class UserService {
                 throw new CustomException(NOT_FOUND_BANK);
             }
             user.setBankNo(newBank.getBankNo());
+        }
+
+        // 이메일 업데이트
+        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNewEmail()) && !user.getEmail().equals(updateUserInfoRequestDto.getNewEmail())) {
+            userRepository.findByEmail(updateUserInfoRequestDto.getNewEmail()).ifPresent(u -> {
+                if (!u.getId().equals(userId)) {
+                    throw new CustomException(ErrorCode.EXIST_USEREMAIL);
+                }
+            });
+            user.setEmail(updateUserInfoRequestDto.getNewEmail());
         }
 
         // 계좌 번호 업데이트
