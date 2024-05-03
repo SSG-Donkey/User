@@ -18,9 +18,12 @@ public enum ErrorCode {
     EXIST_NICKNAME(BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     EXIST_USERID(BAD_REQUEST, "이미 존재하는 아이디입니다."),
     EXIST_USEREMAIL(BAD_REQUEST, "이미 존재하는 이메일입니다."),
+    EXIST_USERACCOUNT(BAD_REQUEST, "이미 존재하는 계좌번호입니다."),
     NOT_FOUND_USER(BAD_REQUEST, "사용자를 찾을 수 없습니다."),
     INVALID_PASSWORD(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_PASSWORD_FORMAT (BAD_REQUEST, "비밀번호 형식이 잘못되었습니다."),
+    
+    
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "회원을 찾을 수 없습니다."),
     NOT_FOUND_BANK(NOT_FOUND, "은행정보를 찾을 수 없습니다.");
