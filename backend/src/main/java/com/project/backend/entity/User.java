@@ -68,6 +68,11 @@ public class User {
         this.password = password;
     }
 
+    // Email 설정
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public void setAccount(Long account) {
         this.account = account;
     }

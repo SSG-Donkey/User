@@ -172,6 +172,15 @@ public class UserService {
             user.setBankNo(newBank.getBankNo());
         }
 
+        // 이메일 업데이트
+        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNewEmail())) {
+            userRepository.findByEmail(updateUserInfoRequestDto.getNewEmail()).ifPresent(u -> {
+                throw new CustomException(ErrorCode.EXIST_USEREMAIL);
+            });
+            user.setEmail(updateUserInfoRequestDto.getNewEmail());
+        }
+
+
         // 계좌 번호 업데이트
         if (updateUserInfoRequestDto.getNewAccount() != null) {
             user.setAccount(updateUserInfoRequestDto.getNewAccount());

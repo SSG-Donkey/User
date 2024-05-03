@@ -8,6 +8,8 @@ import lombok.Setter;
 public class UpdateUserInfoRequestDto {
     private String nickname;
     private String password;
+    private String newEmail;
     private Long newBankNo;
     private Long newAccount;
+
 }
