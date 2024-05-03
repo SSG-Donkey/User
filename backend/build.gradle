@@ -70,6 +70,13 @@ dependencies {
 
 	// Spring Security OAuth2 Client
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.11'
+
+	// Redis Session Storage
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.session:spring-session-data-redis'
+	implementation 'io.lettuce:lettuce-core'
+
+
 }
 
 dependencyManagement {
