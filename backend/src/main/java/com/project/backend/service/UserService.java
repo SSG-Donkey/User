@@ -148,9 +148,11 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         // 닉네임 업데이트
-        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname())) {
+        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname()) && !user.getNickname().equals(updateUserInfoRequestDto.getNickname())) {
             userRepository.findByNickname(updateUserInfoRequestDto.getNickname()).ifPresent(u -> {
-                throw new CustomException(EXIST_NICKNAME);
+                if (!u.getId().equals(userId)) { // 같은 ID가 아닐 경우에만 예외 처리
+                    throw new CustomException(ErrorCode.EXIST_NICKNAME);
+                }
             });
             user.setNickname(updateUserInfoRequestDto.getNickname());
         }
@@ -173,13 +175,14 @@ public class UserService {
         }
 
         // 이메일 업데이트
-        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNewEmail())) {
+        if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNewEmail()) && !user.getEmail().equals(updateUserInfoRequestDto.getNewEmail())) {
             userRepository.findByEmail(updateUserInfoRequestDto.getNewEmail()).ifPresent(u -> {
-                throw new CustomException(ErrorCode.EXIST_USEREMAIL);
+                if (!u.getId().equals(userId)) {
+                    throw new CustomException(ErrorCode.EXIST_USEREMAIL);
+                }
             });
             user.setEmail(updateUserInfoRequestDto.getNewEmail());
         }
-
 
         // 계좌 번호 업데이트
         if (updateUserInfoRequestDto.getNewAccount() != null) {
