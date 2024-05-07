@@ -34,7 +34,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y awscli
 
       - name: Upload JAR to S3
-        run: aws s3 cp ./backend/build/libs/*.jar s3://donkey-jar-bucket/
+        run: |
+          aws s3 cp ./backend/build/libs/*.jar s3://donkey-jar-bucket/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
