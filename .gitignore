@@ -2,8 +2,4 @@ backend/src/main/resources/application.properties
 /.idea/
 /.vscode/
 /backend/.gradle/
-<<<<<<< HEAD
 /backend/build/
-=======
-/backend/build/
->>>>>>> 350ddd07d5bf656b68442234b02a4091212bca49
