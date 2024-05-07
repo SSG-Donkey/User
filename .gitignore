@@ -1,1 +1,5 @@
 backend/src/main/resources/application.properties
+/.idea/
+/.vscode/
+/backend/.gradle/
+/backend/build/
