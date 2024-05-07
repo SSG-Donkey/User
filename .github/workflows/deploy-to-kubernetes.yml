@@ -41,7 +41,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload JAR to S3
-        run: aws s3 cp ./backend/build/libs/*.jar s3://donkey-jar-bucket/        
+        run: aws s3 sync ./backend/build/libs/ s3://donkey-bucket-jar/ 
 
       - name: Login to Amazon ECR
         id: login-ecr
