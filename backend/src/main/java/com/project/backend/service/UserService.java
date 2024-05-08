@@ -1,11 +1,8 @@
 package com.project.backend.service;
 
-import com.project.backend.dto.UpdateUserInfoRequestDto;
+import com.project.backend.dto.*;
 import com.project.backend.entity.Bank;
 import com.project.backend.entity.User;
-import com.project.backend.dto.ResponseMsgDto;
-import com.project.backend.dto.SignupRequestDto;
-import com.project.backend.dto.LoginRequestDto;
 
 import com.project.backend.entity.UserRoleEnum;
 import com.project.backend.exception.CustomException;
@@ -124,7 +121,7 @@ public class UserService {
         }
 
         // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
 
         // 응답 데이터에 닉네임 추가
