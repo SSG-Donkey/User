@@ -21,6 +21,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import com.project.backend.jwt.JwtAuthFilter;
+import com.project.backend.service.OAuth2MemberService;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity // 스프링 Security 지원을 가능하게 함

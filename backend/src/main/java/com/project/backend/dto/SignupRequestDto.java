@@ -10,8 +10,8 @@ import javax.validation.constraints.Size;
 public class SignupRequestDto {
 
 
-    @Size(min = 4, max = 10,message = "[아이디는 4글자~10자 사이로 입력해주세요]")
-    @Pattern(regexp = "^[a-z0-9]*$",message = "[아이디는 알파벳 소문자와 숫자의 형태로 입력해주세요]")
+    @Size(min = 4, max = 10, message = "[아이디는 4글자~10자 사이로 입력해주세요]")
+    @Pattern(regexp = "^[a-z0-9]*$", message = "[아이디는 알파벳 소문자와 숫자의 형태로 입력해주세요]")
     @NotBlank
     private String username;
 
@@ -20,7 +20,7 @@ public class SignupRequestDto {
     @NotBlank
     private String password;
 
-    @Size(min = 2, max = 10,message = "[닉네임은 2글자~10자 사이로 입력해주세요]")
+    @Size(min = 2, max = 10, message = "[닉네임은 2글자~10자 사이로 입력해주세요]")
     @Pattern(regexp = "^[a-zA-Z가-힣0-9]*$", message = "[닉네임은 알파벳, 한글 또는 숫자의 형태로 입력해주세요]")
     @NotBlank
     private String nickname;

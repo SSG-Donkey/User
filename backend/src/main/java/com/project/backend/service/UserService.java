@@ -11,12 +11,17 @@ import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -31,7 +36,8 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final BankService bankService;
-
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     //회원가입
     @Transactional
@@ -120,13 +126,27 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // JWT 토큰 생성
+        // JWT Access, Refresh 토큰 생성
         TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
 
+        // AccessToken cookie에 저장
+        Cookie cookie = null;
+        try {
+            cookie = new Cookie("accesstoken", URLEncoder.encode(token.getAccessToken(), "EUC-KR"));
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        redisTemplate.opsForValue().set("userName", user.getUsername());
+
+
         // 응답 데이터에 닉네임 추가
         Map<String, Object> data = new HashMap<>();
-        data.put("token", token);
+        data.put("accessToken", token.getAccessToken());
         data.put("nickname", user.getNickname());
         data.put("password", user.getPassword());
         data.put("email", user.getEmail());
@@ -135,7 +155,6 @@ public class UserService {
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
     }
-
 
 
     //회원정보 수정
@@ -202,9 +221,6 @@ public class UserService {
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
-
-
-
 
 
 }
