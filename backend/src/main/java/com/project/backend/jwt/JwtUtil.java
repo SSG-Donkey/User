@@ -3,18 +3,21 @@ package com.project.backend.jwt;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import com.project.backend.config.RedisConfig;
 import com.project.backend.dto.TokenDto;
+import com.project.backend.entity.User;
+import com.project.backend.repository.UserRepository;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +27,6 @@ import org.springframework.util.StringUtils;
 
 import com.project.backend.entity.UserRoleEnum;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -32,7 +34,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
-import lombok.extern.slf4j.Slf4j;
 
 @Log
 @Component
@@ -42,6 +43,8 @@ public class JwtUtil {
     private ApplicationContext applicationContext;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private UserRepository UserRepository;
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String AUTHORIZATION_KEY = "auth";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -63,7 +66,44 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    // header 토큰을 가져오기
+
+    // AccessToken, RefreshToken 생성
+    public TokenDto createToken(String userEmail, UserRoleEnum role) {
+        log.info("token creating");
+        // AccessToken 생성
+        String accessToken = createAllToken(userEmail, ACCESS_TOKEN, role);
+        log.info("accessToken: " + accessToken);
+
+        // RefreshToken 생성
+        String refreshToken = createAllToken(userEmail, REFRESH_TOKEN, role);
+        log.info("refreshToken : " + refreshToken);
+        redisTemplate.opsForValue().set("refreshToken: " + userEmail, refreshToken, JwtUtil.REFRESH_TOKEN_TIME, TimeUnit.SECONDS);
+        return new TokenDto(accessToken, refreshToken);
+    }
+
+    public String createAllToken(String userEmail, String token, UserRoleEnum role) {
+        log.info("allToken creating");
+        Date date = new Date();
+        long time = token.equals(ACCESS_TOKEN) ? ACCESS_TOKEN_TIME : REFRESH_TOKEN_TIME;
+
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(userEmail)
+                        .setExpiration(new Date(date.getTime() + time))
+                        .claim(AUTHORIZATION_KEY, role)
+                        .setIssuedAt(date)
+                        .signWith(key, signatureAlgorithm)
+                        .compact();
+    }
+
+    // 토큰의 남은 유효시간을 반환
+    public long getRemainingTime(String token) {
+        long expirationTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getExpiration().getTime();
+        long currentTime = new Date().getTime();
+        return expirationTime - currentTime;
+    }
+
+    // Header에 있는 AccessToken 가져오기
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
@@ -72,27 +112,28 @@ public class JwtUtil {
         return null;
     }
 
-    // AccessToken, RefreshToken 생성
-    public TokenDto createToken(String userEmail, UserRoleEnum role) {
-        log.info("token creating");
-        // AccessToken
-        String accessToken = createAllToken(userEmail, ACCESS_TOKEN, role);
-        log.info("accessToken: " + accessToken);
-
-        // RefreshToken
-        String refreshToken = createAllToken(userEmail, REFRESH_TOKEN, role);
-        log.info("refreshToken : " + refreshToken);
-        redisTemplate.opsForValue().set("refreshToken", refreshToken);
-
-        return new TokenDto(accessToken,refreshToken);
+    // 헤더가 없는 토큰 추출
+    public String resolveToken(String token) {
+        if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
+            return token.substring(7);
+        }
+        return null;
     }
 
-    public String createAllToken(String userEmail, String token, UserRoleEnum role) {
-        log.info("allToken creating");
-        Date date = new Date();
-        long time = token.equals(ACCESS_TOKEN) ? ACCESS_TOKEN_TIME : REFRESH_TOKEN_TIME;
+    // 토큰에서 사용자 정보 가져오기
+    public String getUserInfoFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+    }
 
-        return BEARER_PREFIX + Jwts.builder().setSubject(userEmail).setExpiration(new Date(date.getTime() + time)).claim(AUTHORIZATION_KEY, role).setIssuedAt(date).signWith(key, signatureAlgorithm).compact();
+    // 인증 객체 생성
+    public Authentication createAuthentication(String username) {
+        UserDetailsService userDetailsService = getUserDetailsService();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    private UserDetailsService getUserDetailsService() {
+        return applicationContext.getBean(UserDetailsService.class);
     }
 
     // 토큰 검증
@@ -111,21 +152,5 @@ public class JwtUtil {
             log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return false;
-    }
-
-    // 토큰에서 사용자 정보 가져오기
-    public String getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
-    }
-
-    // 인증 객체 생성
-    public Authentication createAuthentication(String username) {
-        UserDetailsService userDetailsService = getUserDetailsService();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-    }
-
-    private UserDetailsService getUserDetailsService() {
-        return applicationContext.getBean(UserDetailsService.class);
     }
 }

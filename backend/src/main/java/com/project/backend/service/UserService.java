@@ -10,24 +10,29 @@ import com.project.backend.exception.ErrorCode;
 import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.project.backend.exception.ErrorCode.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -113,13 +118,12 @@ public class UserService {
 
     // 로그인
     @Transactional
-    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpSession session) {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
         // 사용자 찾기
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         // 비밀번호 검증
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -130,19 +134,13 @@ public class UserService {
         TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
 
+
         // AccessToken cookie에 저장
         Cookie cookie = null;
-        try {
-            cookie = new Cookie("accesstoken", URLEncoder.encode(token.getAccessToken(), "EUC-KR"));
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-        redisTemplate.opsForValue().set("userName", user.getUsername());
-
+        cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         // 응답 데이터에 닉네임 추가
         Map<String, Object> data = new HashMap<>();
@@ -160,8 +158,7 @@ public class UserService {
     //회원정보 수정
     @Transactional
     public ResponseMsgDto updateUserInfo(Long userId, UpdateUserInfoRequestDto updateUserInfoRequestDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         // 닉네임 업데이트
         if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname()) && !user.getNickname().equals(updateUserInfoRequestDto.getNickname())) {
@@ -214,8 +211,7 @@ public class UserService {
     // 회원탈퇴
     @Transactional
     public ResponseMsgDto deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         userRepository.delete(user);
 
