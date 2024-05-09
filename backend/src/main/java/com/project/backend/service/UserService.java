@@ -217,6 +217,6 @@ public class UserService {
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
-
+    // 로그 아웃
 
 }

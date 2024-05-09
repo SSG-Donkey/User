@@ -66,23 +66,23 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-
-    // AccessToken, RefreshToken 생성
+    // AccessToken, RefreshToken 생성 요청
     public TokenDto createToken(String userEmail, UserRoleEnum role) {
         log.info("token creating");
+
         // AccessToken 생성
         String accessToken = createAllToken(userEmail, ACCESS_TOKEN, role);
         log.info("accessToken: " + accessToken);
 
-        // RefreshToken 생성
+        // RefreshToken 생성( accessToken 을 key 에 포함시켜 찾기 쉽게 저장 )
         String refreshToken = createAllToken(userEmail, REFRESH_TOKEN, role);
         log.info("refreshToken : " + refreshToken);
         redisTemplate.opsForValue().set("refreshToken: " + userEmail, refreshToken, JwtUtil.REFRESH_TOKEN_TIME, TimeUnit.SECONDS);
         return new TokenDto(accessToken, refreshToken);
     }
 
+    // token 생성
     public String createAllToken(String userEmail, String token, UserRoleEnum role) {
-        log.info("allToken creating");
         Date date = new Date();
         long time = token.equals(ACCESS_TOKEN) ? ACCESS_TOKEN_TIME : REFRESH_TOKEN_TIME;
 
@@ -106,6 +106,8 @@ public class JwtUtil {
     // Header에 있는 AccessToken 가져오기
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        log.info("AccessToken값 : " + bearerToken);
+
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
@@ -143,7 +145,6 @@ public class JwtUtil {
             return true;
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token, 만료된 JWT token 입니다.");
-            // Accesstoken 재발급 후, 다시 인증요청 보내기
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (UnsupportedJwtException e) {

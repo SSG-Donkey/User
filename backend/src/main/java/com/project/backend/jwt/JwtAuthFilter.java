@@ -3,6 +3,7 @@ package com.project.backend.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.backend.dto.ResponseMsgDto;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -31,20 +33,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     final RedisTemplate<String, Object> redisTemplate;
 
+    // 사용자 이름으로 인증 객체 생성후 SecurityContext 에 저장
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("TokenFiltering ----");
 
+        //AccessToken 가져오기
         String token = jwtUtil.resolveToken(request);
+        log.info("resolveToken : " + token);
 
-        log.info("resolveToken : "+token);
+        // AccessToken 이 존재하는 경우
         if (token != null) {
-            // Access 토큰 유효 시, security context에 인증 정보 저장
+            // Access 토큰 유효 시, securityContext에 인증 정보 저장
             if (jwtUtil.validateToken(token)) {
-                // Redis에 해당 accessToken logout 여부를 확인
-                String isLogout = (String) redisTemplate.opsForValue().get("BL:" + token);
-                log.info("로그인 유무() :  "+isLogout);
-                // 로그아웃이 없는(되어 있지 않은) 경우 해당 토큰은 정상적으로 작동하기
+                // logout 여부를 확인( logout시 해당 사용자의 refreshToken에 BL을 붙여 저장 )
+                String name = jwtUtil.getUserInfoFromToken(token);
+                String isLogout = (String) redisTemplate.opsForValue().get("BL refreshToken" + name);
+                log.info("로그인 유무() :  " + isLogout);
+
+                // 로그아웃이 안된 경우 해당 토큰은 정상적으로 작동하기
                 if (ObjectUtils.isEmpty(isLogout)) {
                     setAuthentication(jwtUtil.getUserInfoFromToken(token));
                 }
@@ -56,12 +64,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
     public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(username);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+        log.info(context.getAuthentication().toString());
     }
 
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {

@@ -58,7 +58,7 @@ public class RedisController {
         log.info("AccessToken Auth");
         String decode = URLDecoder.decode(accessToken, StandardCharsets.UTF_8);
         log.info("AccessToken: " + decode);
-        String name = jwtUtil.getUserInfoFromToken(decode.substring(7));
+        String name = jwtUtil.resolveToken(decode);
         log.info("name : " + name);
 
         jwtUtil.createAuthentication(name);
