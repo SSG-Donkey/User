@@ -37,11 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("TokenFiltering ----");
 
         //AccessToken 가져오기
         String token = jwtUtil.resolveToken(request);
-        log.info("resolveToken : " + token);
 
         // AccessToken 이 존재하는 경우
         if (token != null) {
