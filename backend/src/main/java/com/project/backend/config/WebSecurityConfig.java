@@ -5,6 +5,7 @@ import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +22,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import com.project.backend.jwt.JwtAuthFilter;
+import com.project.backend.service.OAuth2MemberService;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity // 스프링 Security 지원을 가능하게 함
@@ -63,8 +68,9 @@ public class WebSecurityConfig {
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/**").permitAll() // 모든 요청에 대해 접근을 허용
-//                .antMatchers("/private/**").authenticated() // "/private/**" 경로는 인증 필요
+                .antMatchers(HttpMethod.GET,"/**").permitAll() // 모든 요청에 대해 접근을 허용
+                .antMatchers(HttpMethod.POST,"/**").permitAll() // 모든 요청에 대해 접근을 허용
+                //.antMatchers(HttpMethod.POST, "/**").authenticated() // "/private/**" 경로는 인증 필요
                 .and().oauth2Login()
                 .loginPage("/loginForm") // 로그인 필요 시 이동할 페이지 지정
                 .defaultSuccessUrl("https://www.dangnagwi.store/index.html") // OAuth 로그인 성공 후 리다이렉트 될 기본 URL
