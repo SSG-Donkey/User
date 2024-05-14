@@ -70,7 +70,7 @@ public class WebSecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/user/login").permitAll()
                 .antMatchers("/user/signup  ").permitAll()
-                .antMatchers(HttpMethod.GET, "/**").permitAll() // GET으로 오는 모든 요청 허용
+                .antMatchers("/**").permitAll() // 모든 요청 허용
                 .antMatchers(HttpMethod.POST, "/**").authenticated() // POST로 오는 모든 요청 인증 검증
                 .antMatchers(HttpMethod.PUT, "/**").authenticated() // PUT로 오는 모든 요청 인증 검증
                 .antMatchers(HttpMethod.DELETE, "/**").authenticated() // DELETE로 오는 모든 요청 인증 검증
