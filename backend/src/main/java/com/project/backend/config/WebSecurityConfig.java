@@ -69,6 +69,7 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/**").permitAll() // 모든 요청에 대해 접근을 허용
+                .antMatchers(HttpMethod.POST,"/**").permitAll() // 모든 요청에 대해 접근을 허용
                 //.antMatchers(HttpMethod.POST, "/**").authenticated() // "/private/**" 경로는 인증 필요
                 .and().oauth2Login()
                 .loginPage("/loginForm") // 로그인 필요 시 이동할 페이지 지정
