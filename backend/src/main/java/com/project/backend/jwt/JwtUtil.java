@@ -3,6 +3,7 @@ package com.project.backend.jwt;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -105,14 +106,20 @@ public class JwtUtil {
 
     // Header에 있는 AccessToken 가져오기
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("AccessToken값 : " + bearerToken);
+        Enumeration<String> headers = request.getHeaderNames();
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            log.info("Header: " + header + " - Value: " + request.getHeader(header));
+        }
 
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        log.info("Bearer Token: " + bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;
     }
+
 
     // 헤더가 없는 토큰 추출
     public String resolveToken(String token) {

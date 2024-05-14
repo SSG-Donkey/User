@@ -8,7 +8,8 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
-@Entity(name = "user")
+@Entity
+@Table(name = "user")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
