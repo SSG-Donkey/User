@@ -65,10 +65,12 @@ public class WebSecurityConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf().disable();
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // 모든 요청 허용
         http.authorizeRequests().antMatchers("/**").permitAll()
                 //.antMatchers(HttpMethod.GET,"/**").permitAll() // GET으로 오는 모든 요청 허용
                 //.antMatchers(HttpMethod.POST, "/**").authenticated() // POST로 오는 모든 요청 인증 검증
                 .and().oauth2Login().loginPage("/loginForm") // 로그인 필요 시 이동할 페이지 지정
+
                 .defaultSuccessUrl("/index.html") // OAuth 로그인 성공 후 리다이렉트 될 기본 URL
                 .userInfoEndpoint().userService(oAuth2MemberService) // OAuth 로그인 후 사용자 정보를 처리할 서비스 지정
                 .and().and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
