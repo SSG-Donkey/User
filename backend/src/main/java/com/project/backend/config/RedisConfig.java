@@ -28,14 +28,11 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPassword(RedisPassword.of(password));
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
-    @Bean
-    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer();
-    }
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         final RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setDefaultSerializer(new StringRedisSerializer());
+        template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
         template.setConnectionFactory(lettuceConnectionFactory());
         return template;
     }
