@@ -2,6 +2,7 @@ package com.project.backend.service;
 
 import com.project.backend.entity.User;
 import com.project.backend.repository.UserRepository;
+import lombok.extern.java.Log;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
+@Log
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
@@ -22,6 +24,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        log.info("OAuth2User: " + oAuth2User.getAttributes());  // 사용자 정보 로그 출력
 
         // OAuth2 제공자로부터 받은 사용자 정보
         Map<String, Object> attributes = oAuth2User.getAttributes();

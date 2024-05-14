@@ -69,15 +69,17 @@ public class JwtUtil {
 
     // AccessToken, RefreshToken 생성 요청
     public TokenDto createToken(String userEmail, UserRoleEnum role) {
-        log.info("token creating");
+        log.info("Creating token for user: " + userEmail);
 
         // AccessToken 생성
         String accessToken = createAllToken(userEmail, ACCESS_TOKEN, role);
-        log.info("accessToken: " + accessToken);
-
         // RefreshToken 생성( accessToken 을 key 에 포함시켜 찾기 쉽게 저장 )
         String refreshToken = createAllToken(userEmail, REFRESH_TOKEN, role);
-        log.info("refreshToken : " + refreshToken);
+
+        log.info("AccessToken: " + accessToken);
+        log.info("RefreshToken: " + refreshToken);
+
+
         redisTemplate.opsForValue().set("refreshToken: " + userEmail, refreshToken, JwtUtil.REFRESH_TOKEN_TIME, TimeUnit.SECONDS);
         return new TokenDto(accessToken, refreshToken);
     }
