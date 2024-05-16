@@ -94,29 +94,6 @@ public class UserService {
 
 
     // 로그인
-//    @Transactional
-//    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
-//        String username = loginRequestDto.getUsername();
-//        String password = loginRequestDto.getPassword();
-//
-//        // 로그인 시도하는 사용자 이름을 로그에 출력
-//        System.out.println("Attempting to find user with username: " + username);
-//        System.out.println("Attempting to find user with password: " + password);
-//
-//        User user = userRepository.findByUsername(username).orElseThrow(
-//                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
-//
-//        if(!passwordEncoder.matches(password, user.getPassword())){
-//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-//        }
-//        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
-//
-//        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", token);
-//    }
-
-
-    // 로그인
     @Transactional
     public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpSession session) {
         String username = loginRequestDto.getUsername();
@@ -150,6 +127,7 @@ public class UserService {
         data.put("email", user.getEmail());
         data.put("bankNo", user.getBankNo());
         data.put("userId", user.getId());
+        data.put("username", user.getUsername());
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
     }
