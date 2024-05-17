@@ -70,6 +70,8 @@ dependencies {
 
 	// Spring Security OAuth2 Client
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.11'
+	implementation 'org.springframework.security:spring-security-oauth2-core:5.7.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
 	// Redis Session Storage
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
