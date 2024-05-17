@@ -65,7 +65,7 @@ public class UserController {
     //로그아웃
     @Operation(summary = "로그아웃 API", description = "로그아웃시 cookie의 AccessToken을 삭제합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "로그아웃 완료")})
-    @PostMapping("/user/{userId}")
+    @PostMapping("/logout")
     public ResponseMsgDto logoutUser(HttpServletRequest request, HttpServletResponse response) {
         return userService.logoutUser(request, response);
     }
