@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import com.project.backend.dto.TokenDto;
@@ -108,16 +109,21 @@ public class JwtUtil {
 
     // Header에 있는 AccessToken 가져오기
     public String resolveToken(HttpServletRequest request) {
-        Enumeration<String> headers = request.getHeaderNames();
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            log.info("Header: " + header + " - Value: " + request.getHeader(header));
-        }
-
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("Bearer Token: " + bearerToken);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+        // cookie 값 가져오기
+        Cookie[] cookies = request.getCookies();
+        log.info("cookie들: "+cookies);
+        // 쿠키가 존재할 경우
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                // AccessToken이라는 이름의 쿠키를 가져와서 accessToken에 넣음
+                if (cookie.getName().equals("AccessToken")) {
+                    String accessToken = cookie.getValue();
+                    log.info("Bearer Token: " + accessToken);
+                    if (StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER_PREFIX)) {
+                        return accessToken.substring(7);
+                    }
+                }
+            }
         }
         return null;
     }

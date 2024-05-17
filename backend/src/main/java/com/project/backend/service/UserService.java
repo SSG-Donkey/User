@@ -199,7 +199,7 @@ public class UserService {
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
 
-    // 로그 아웃
+    // 로그아웃
     @Transactional
     public ResponseMsgDto logoutUser(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
