@@ -33,8 +33,8 @@ public class RedisConfig {
         return new GenericJackson2JsonRedisSerializer();
     }
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        final RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, String > redisTemplate() {
+        final RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(springSessionDefaultRedisSerializer()); // 값 직렬화기로 GenericJackson2JsonRedisSerializer 사용
         template.setHashKeySerializer(new StringRedisSerializer());
