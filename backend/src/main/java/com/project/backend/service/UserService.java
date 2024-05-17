@@ -206,12 +206,13 @@ public class UserService {
         log.info("logout AccessToken:"+cookies);
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                log.info("cookie name:"+cookie.getName());
                 if (cookie.getName().equals("AccessToken")) {
+                    log.info("cookie name:"+cookie.getName());
                     cookie.setMaxAge(0);
                     cookie.setHttpOnly(true);
                     cookie.setPath("/");
                     response.addCookie(cookie);
+                    log.info("cookie 값: "+cookie);
                 }
             }
         }

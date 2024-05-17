@@ -44,14 +44,14 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
         if (user != null) {
-//            TokenDto token = jwtUtil.createToken(user.getEmail(), user.getRole());
-//            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
-//
-//            Cookie cookie = null;
-//            cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
-//            cookie.setHttpOnly(true);
-//            cookie.setPath("/");
-//            response.addCookie(cookie);
+            TokenDto token = jwtUtil.createToken(user.getEmail(), user.getRole());
+            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
+
+            Cookie cookie = null;
+            cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            response.addCookie(cookie);
         }
 
         // 사용자 정보를 처리하고, 필요한 경우 추가적인 작업을 수행합니다.
