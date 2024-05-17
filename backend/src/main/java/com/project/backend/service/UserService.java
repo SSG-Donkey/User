@@ -203,8 +203,10 @@ public class UserService {
     @Transactional
     public ResponseMsgDto logoutUser(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
+        log.info("logout AccessToken:"+cookies);
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                log.info("cookie name:"+cookie.getName());
                 if (cookie.getName().equals("AccessToken")) {
                     cookie.setMaxAge(0);
                     cookie.setHttpOnly(true);
