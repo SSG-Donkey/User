@@ -49,6 +49,7 @@ public class RedisController {
         Cookie cookie = new Cookie("accessToken", URLEncoder.encode(token.getAccessToken(), "EUC-KR"));
         cookie.setHttpOnly(true);
         cookie.setPath("/");
+        cookie.setMaxAge(30*60);
         response.addCookie(cookie);
         return token.getAccessToken();
     }

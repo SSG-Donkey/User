@@ -117,6 +117,7 @@ public class UserService {
         cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
         cookie.setHttpOnly(true);
         cookie.setPath("/");
+        cookie.setMaxAge(30 * 60);
         response.addCookie(cookie);
 
         // 응답 데이터에 닉네임 추가
