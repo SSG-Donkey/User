@@ -15,12 +15,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
@@ -95,7 +97,7 @@ public class UserService {
 
     // 로그인
     @Transactional
-    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpSession session) {
+    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
@@ -196,6 +198,22 @@ public class UserService {
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
-    // 로그 아웃
 
+    // 로그 아웃
+    @Transactional
+    public ResponseMsgDto logoutUser(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("AccessToken")) {
+                    cookie.setMaxAge(0);
+                    cookie.setHttpOnly(true);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+            }
+        }
+
+        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그아웃 되었습니다.", null);
+    }
 }
