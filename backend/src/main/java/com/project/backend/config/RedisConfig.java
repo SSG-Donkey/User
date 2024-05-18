@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponseType;
@@ -33,22 +34,15 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        // MixIn 등록
-        mapper.addMixIn(OAuth2AuthorizationResponseType.class, OAuth2AuthorizationResponseTypeMixIn.class);
-        return mapper;
-    }
 
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer(objectMapper());
+        return new JdkSerializationRedisSerializer();
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        final RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate() {
+        final RedisTemplate<String, String > template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(springSessionDefaultRedisSerializer()); // 값 직렬화기로 GenericJackson2JsonRedisSerializer 사용
         template.setHashKeySerializer(new StringRedisSerializer());
@@ -57,9 +51,4 @@ public class RedisConfig {
         return template;
     }
 
-    public abstract static class OAuth2AuthorizationResponseTypeMixIn {
-        @JsonCreator
-        public OAuth2AuthorizationResponseTypeMixIn(@JsonProperty("value") String value) {
-        }
-    }
 }

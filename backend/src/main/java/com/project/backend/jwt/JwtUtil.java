@@ -44,7 +44,7 @@ public class JwtUtil {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String > redisTemplate;
     @Autowired
     private UserRepository UserRepository;
     public static final String AUTHORIZATION_HEADER = "Authorization";
