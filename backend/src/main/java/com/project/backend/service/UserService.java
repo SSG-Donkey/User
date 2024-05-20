@@ -1,8 +1,11 @@
 package com.project.backend.service;
 
-import com.project.backend.dto.*;
+import com.project.backend.dto.UpdateUserInfoRequestDto;
 import com.project.backend.entity.Bank;
 import com.project.backend.entity.User;
+import com.project.backend.dto.ResponseMsgDto;
+import com.project.backend.dto.SignupRequestDto;
+import com.project.backend.dto.LoginRequestDto;
 
 import com.project.backend.entity.UserRoleEnum;
 import com.project.backend.exception.CustomException;
@@ -10,31 +13,19 @@ import com.project.backend.exception.ErrorCode;
 import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.project.backend.exception.ErrorCode.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -43,8 +34,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final BankService bankService;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+
 
     //회원가입
     @Transactional
@@ -95,45 +85,6 @@ public class UserService {
     }
 
 
-//    // 로그인
-//    @Transactional
-//    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
-//        String username = loginRequestDto.getUsername();
-//        String password = loginRequestDto.getPassword();
-//
-//        // 사용자 찾기
-//        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-//
-//        // 비밀번호 검증
-//        if (!passwordEncoder.matches(password, user.getPassword())) {
-//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-//        }
-//
-//        // JWT Access, Refresh 토큰 생성
-//        TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
-//
-//
-//        // AccessToken cookie에 저장
-//        Cookie cookie = null;
-//        cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
-//        cookie.setHttpOnly(true);
-//        cookie.setPath("/");
-//        cookie.setMaxAge(30 * 60);
-//        response.addCookie(cookie);
-//
-//        // 응답 데이터에 닉네임 추가
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("accessToken", token.getAccessToken());
-//        data.put("nickname", user.getNickname());
-//        data.put("password", user.getPassword());
-//        data.put("email", user.getEmail());
-//        data.put("bankNo", user.getBankNo());
-//        data.put("userId", user.getId());
-//        data.put("username", user.getUsername());
-//
-//        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
-//    }
 
     // 로그인
     @Transactional
@@ -168,10 +119,12 @@ public class UserService {
     }
 
 
+
     //회원정보 수정
     @Transactional
     public ResponseMsgDto updateUserInfo(Long userId, UpdateUserInfoRequestDto updateUserInfoRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         // 닉네임 업데이트
         if (StringUtils.isNotBlank(updateUserInfoRequestDto.getNickname()) && !user.getNickname().equals(updateUserInfoRequestDto.getNickname())) {
@@ -224,31 +177,16 @@ public class UserService {
     // 회원탈퇴
     @Transactional
     public ResponseMsgDto deleteUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         userRepository.delete(user);
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
 
-    // 로그아웃
-    @Transactional
-    public ResponseMsgDto logoutUser(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        log.info("logout AccessToken:"+cookies);
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("AccessToken")) {
-                    log.info("cookie name:"+cookie.getName());
-                    cookie.setMaxAge(0);
-                    cookie.setHttpOnly(true);
-                    cookie.setPath("/");
-                    response.addCookie(cookie);
-                    log.info("cookie 값: "+cookie);
-                }
-            }
-        }
 
-        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그아웃 되었습니다.", null);
-    }
+
+
+
 }
