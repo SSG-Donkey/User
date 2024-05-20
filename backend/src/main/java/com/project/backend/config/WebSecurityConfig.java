@@ -47,7 +47,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://www.dangnagwi.store")); // 허용할 오리진
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 허용할 오리진
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP 메소드
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token")); // 허용할 헤더
         configuration.setAllowCredentials(true); // 쿠키를 넘기도록 허용
@@ -76,9 +76,6 @@ public class WebSecurityConfig {
 
         return http.build();
     }
-
-
-
 
 
 }
