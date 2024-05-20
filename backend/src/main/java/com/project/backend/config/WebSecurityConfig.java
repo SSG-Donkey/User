@@ -4,6 +4,8 @@ import com.project.backend.jwt.JwtAuthFilter;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -27,8 +29,10 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private final OAuth2MemberService oAuth2MemberService;
+
     private final JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    private final ApplicationContext applicationContext;  // 추가: ApplicationContext 사용
 
 
     @Bean
@@ -57,6 +61,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        OAuth2MemberService oAuth2MemberService = applicationContext.getBean(OAuth2MemberService.class);  // 서비스 동적 로딩
         http.cors()
                 .configurationSource(corsConfigurationSource())
                 .and()
@@ -79,3 +84,4 @@ public class WebSecurityConfig {
         return http.build();
     }
 }
+
