@@ -73,12 +73,6 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-oauth2-core:5.7.2'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
-	// Redis Session Storage
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.session:spring-session-data-redis'
-	implementation 'io.lettuce:lettuce-core'
-
-
 }
 
 dependencyManagement {
