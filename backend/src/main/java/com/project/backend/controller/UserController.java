@@ -57,8 +57,6 @@ public class UserController {
         return mav;
     }
 
-
-
     @Operation(summary = "회원 정보 업데이트 API", description = "사용자의 닉네임, 비밀번호, 및 은행 정보를 업데이트합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 정보 업데이트 완료")})
     @PutMapping("/user/{userId}/updateInfo")
