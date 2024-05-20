@@ -25,7 +25,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
+@RequiredArgsConstructor
 public class WebSecurityConfig {
     private final OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
