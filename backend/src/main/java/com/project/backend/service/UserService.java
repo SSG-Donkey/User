@@ -11,6 +11,7 @@ import com.project.backend.entity.UserRoleEnum;
 import com.project.backend.exception.CustomException;
 import com.project.backend.exception.ErrorCode;
 import com.project.backend.jwt.JwtUtil;
+import com.project.backend.repository.UserRegistrationService;
 import com.project.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,7 @@ import static com.project.backend.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserRegistrationService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -183,6 +184,34 @@ public class UserService {
         userRepository.delete(user);
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
+    }
+
+
+    @Transactional
+    public void updateUserLoginDetails(String email, Map<String, Object> attributes) {
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    // 새 사용자를 등록하는 경우의 로직 (필요한 경우)
+                    return registerNewUser(attributes);
+                });
+
+        // OAuth2 인증을 통해 얻은 속성 업데이트
+        String newName = (String) attributes.get("name");
+        if (!newName.equals(user.getNickname())) {
+            user.setNickname(newName);
+        }
+
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public User registerNewUser(Map<String, Object> attributes) {
+        String email = (String) attributes.get("email");
+        String name = (String) attributes.get("name");
+        User newUser = new User(name, email, "", email, null, null);  // 예제이므로 필요한 필드 채워주기
+        newUser.setRole(UserRoleEnum.USER);  // 기본 역할 설정
+        return userRepository.save(newUser);
     }
 
 
