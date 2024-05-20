@@ -186,6 +186,33 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void updateUserLoginDetails(String email, Map<String, Object> attributes) {
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    // 새 사용자를 등록하는 경우의 로직 (필요한 경우)
+                    return registerNewUser(attributes);
+                });
+
+        // OAuth2 인증을 통해 얻은 속성 업데이트
+        String newName = (String) attributes.get("name");
+        if (!newName.equals(user.getNickname())) {
+            user.setNickname(newName);
+        }
+
+        userRepository.save(user);
+    }
+
+    private User registerNewUser(Map<String, Object> attributes) {
+        String email = (String) attributes.get("email");
+        String name = (String) attributes.get("name");
+        // 이메일을 username으로 사용한다고 가정
+        User newUser = new User(name, email, "", email, null, null);
+        newUser.setRole(UserRoleEnum.USER); // 기본 권한 설정
+        return userRepository.save(newUser);
+    }
+
+
 
 
 

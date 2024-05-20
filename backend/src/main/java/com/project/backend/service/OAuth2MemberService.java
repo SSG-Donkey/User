@@ -3,6 +3,7 @@ package com.project.backend.service;
 import com.project.backend.entity.User;
 import com.project.backend.repository.UserRepository;
 import com.project.backend.security.PrincipalDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -14,10 +15,12 @@ import java.util.Map;
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final UserService userService; // UserService 추가
 
-    // UserRepository 주입
-    public OAuth2MemberService(UserRepository userRepository) {
+    // 수동으로 생성자 작성
+    public OAuth2MemberService(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -25,24 +28,28 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String email = (String) attributes.get("email");
+
+        userService.updateUserLoginDetails(email, attributes);
+
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createUser(email, attributes));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+
         return new PrincipalDetails(user, attributes);
     }
-
-
-    private User createUser(String email, Map<String, Object> attributes) {
-        // 새 사용자 생성 로직
-        User user = new User(
-                (String) attributes.get("name"), // nickname
-                email, // username, 이 예제에서는 email을 username으로 사용
-                "", // password, OAuth2 인증에서는 비밀번호가 필요 없으므로 빈 문자열 처리
-                email, // email
-                null, // bankNo, NULL로 설정
-                null  // account, NULL로 설정
+    private User registerNewUser(Map<String, Object> attributes) {
+        User newUser = new User(
+                (String) attributes.get("name"),
+                (String) attributes.get("email"),
+                "", // Password
+                (String) attributes.get("email"),
+                null, // Bank number
+                null  // Account number
         );
-        userRepository.save(user);
-        return user;
+        return userRepository.save(newUser);
     }
 
+    private User updateExistingUser(User user, Map<String, Object> attributes) {
+        user.setNickname((String) attributes.get("name"));
+        return userRepository.save(user);
+    }
 }
