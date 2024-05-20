@@ -95,6 +95,46 @@ public class UserService {
     }
 
 
+//    // 로그인
+//    @Transactional
+//    public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+//        String username = loginRequestDto.getUsername();
+//        String password = loginRequestDto.getPassword();
+//
+//        // 사용자 찾기
+//        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+//
+//        // 비밀번호 검증
+//        if (!passwordEncoder.matches(password, user.getPassword())) {
+//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+//        }
+//
+//        // JWT Access, Refresh 토큰 생성
+//        TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
+//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
+//
+//
+//        // AccessToken cookie에 저장
+//        Cookie cookie = null;
+//        cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
+//        cookie.setHttpOnly(true);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(30 * 60);
+//        response.addCookie(cookie);
+//
+//        // 응답 데이터에 닉네임 추가
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("accessToken", token.getAccessToken());
+//        data.put("nickname", user.getNickname());
+//        data.put("password", user.getPassword());
+//        data.put("email", user.getEmail());
+//        data.put("bankNo", user.getBankNo());
+//        data.put("userId", user.getId());
+//        data.put("username", user.getUsername());
+//
+//        return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
+//    }
+
     // 로그인
     @Transactional
     public ResponseMsgDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
@@ -102,29 +142,21 @@ public class UserService {
         String password = loginRequestDto.getPassword();
 
         // 사용자 찾기
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         // 비밀번호 검증
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // JWT Access, Refresh 토큰 생성
-        TokenDto token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        // JWT 토큰 생성
+        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
-
-
-        // AccessToken cookie에 저장
-        Cookie cookie = null;
-        cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(30 * 60);
-        response.addCookie(cookie);
 
         // 응답 데이터에 닉네임 추가
         Map<String, Object> data = new HashMap<>();
-        data.put("accessToken", token.getAccessToken());
+        data.put("token", token);
         data.put("nickname", user.getNickname());
         data.put("password", user.getPassword());
         data.put("email", user.getEmail());

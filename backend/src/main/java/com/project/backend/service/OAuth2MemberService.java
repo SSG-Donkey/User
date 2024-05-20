@@ -1,39 +1,27 @@
 package com.project.backend.service;
 
-import antlr.Token;
-import com.nimbusds.oauth2.sdk.http.HTTPResponse;
-import com.project.backend.dto.TokenDto;
 import com.project.backend.entity.User;
-import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
-import lombok.extern.java.Log;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Service
-@Log
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-    private JwtUtil jwtUtil;
 
     // UserRepository 주입
     public OAuth2MemberService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public OAuth2User loadUser(OAuth2UserRequest userRequest, HttpServletResponse response) throws OAuth2AuthenticationException {
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        log.info("OAuth2User: " + oAuth2User.getAttributes());  // 사용자 정보 로그 출력
 
         // OAuth2 제공자로부터 받은 사용자 정보
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -43,16 +31,6 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String email = (String) attributes.get("email");
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
-        if (user != null) {
-            TokenDto token = jwtUtil.createToken(user.getEmail(), user.getRole());
-            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
-
-            Cookie cookie = null;
-            cookie = new Cookie("AccessToken", URLEncoder.encode(token.getAccessToken(), StandardCharsets.UTF_8));
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        }
 
         // 사용자 정보를 처리하고, 필요한 경우 추가적인 작업을 수행합니다.
         // 예를 들어, PrincipalDetails 객체를 생성하여 반환할 수 있습니다.
