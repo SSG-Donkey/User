@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/user")
 public class OAuthController {
-    @GetMapping("/loginForm")
+    @GetMapping("/https://www.dangnagwi.store/loginForm.html")
     public String home() {
         return "loginForm";
     }
