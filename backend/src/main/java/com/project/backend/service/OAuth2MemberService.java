@@ -3,21 +3,21 @@ package com.project.backend.service;
 import com.project.backend.entity.User;
 import com.project.backend.repository.UserRepository;
 import com.project.backend.security.PrincipalDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.Map;
 
 @Service
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-    private final UserService userService; // UserService 추가
+    private final UserService userService; // UserService 의존성 주입
 
-    // 수동으로 생성자 작성
     public OAuth2MemberService(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
@@ -29,27 +29,15 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String email = (String) attributes.get("email");
 
-        userService.updateUserLoginDetails(email, attributes);
+        // 기존 사용자 정보 조회 또는 업데이트
+        User user = userRepository.findByEmail(email).orElseGet(() -> userService.registerNewUser(attributes));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
 
         return new PrincipalDetails(user, attributes);
     }
-    private User registerNewUser(Map<String, Object> attributes) {
-        User newUser = new User(
-                (String) attributes.get("name"),
-                (String) attributes.get("email"),
-                "", // Password
-                (String) attributes.get("email"),
-                null, // Bank number
-                null  // Account number
-        );
-        return userRepository.save(newUser);
-    }
 
-    private User updateExistingUser(User user, Map<String, Object> attributes) {
-        user.setNickname((String) attributes.get("name"));
-        return userRepository.save(user);
-    }
+
 }
+
+
+

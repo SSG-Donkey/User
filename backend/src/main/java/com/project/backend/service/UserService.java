@@ -203,10 +203,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private User registerNewUser(Map<String, Object> attributes) {
+    public User registerNewUser(Map<String, Object> attributes) {
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
-        // 이메일을 username으로 사용한다고 가정
         User newUser = new User(name, email, "", email, null, null);
         newUser.setRole(UserRoleEnum.USER); // 기본 권한 설정
         return userRepository.save(newUser);
