@@ -87,4 +87,5 @@ public class User {
     public UserRoleEnum getRole() {
         return role;
     }
+
 }
