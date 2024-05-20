@@ -2,7 +2,6 @@ package com.project.backend.controller;
 
 import com.project.backend.dto.*;
 import com.project.backend.service.UserService;
-import com.project.backend.service.OAuth2MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
