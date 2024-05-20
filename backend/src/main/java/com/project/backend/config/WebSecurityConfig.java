@@ -1,5 +1,6 @@
 package com.project.backend.config;
 
+import com.project.backend.exception.CustomAuthenticationFailureHandler;
 import com.project.backend.jwt.JwtAuthFilter;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,7 @@ public class WebSecurityConfig {
                 .antMatchers("/private/**").authenticated() // "/private/**" 경로는 인증 필요
                 .and().oauth2Login()
                 .loginPage("/loginForm") // 로그인 필요 시 이동할 페이지 지정
+                .failureHandler(new CustomAuthenticationFailureHandler())  // 커스텀 실패 핸들러 적용
                 .defaultSuccessUrl("/https://www.dangnagwi.store") // OAuth 로그인 성공 후 리다이렉트 될 기본 URL
                 .userInfoEndpoint().userService(oAuth2MemberService) // OAuth 로그인 후 사용자 정보를 처리할 서비스 지정
                 .and()
@@ -74,4 +76,9 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+
+
+
+
+
 }
