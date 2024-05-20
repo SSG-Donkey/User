@@ -11,9 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Tag(name = "userController", description = "유저관리 API")
@@ -40,7 +38,7 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "로그인 완료")})
     //로그인
     @PostMapping("/login")
-    public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return userService.login(loginRequestDto, response);
     }
 
@@ -55,12 +53,11 @@ public class UserController {
     }
 
     //회원탈퇴
+
     @Operation(summary = "회원 탈퇴 API", description = "사용자의 계정을 삭제합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 탈퇴 완료")})
     @DeleteMapping("/user/{userId}")
     public ResponseMsgDto deleteUser(@PathVariable Long userId) {
         return userService.deleteUser(userId);
     }
-
-
 }
