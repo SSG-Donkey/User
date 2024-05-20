@@ -22,7 +22,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     public User registerNewUser(Map<String, Object> attributes) {
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
-        User newUser = new User(name, email, passwordEncoder.encode("defaultPassword"), email, null, null);
+        User newUser = new User(name, email, passwordEncoder.encode("12345"), email, null, null);
         newUser.setRole(UserRoleEnum.USER);
         return userRepository.save(newUser);
     }
