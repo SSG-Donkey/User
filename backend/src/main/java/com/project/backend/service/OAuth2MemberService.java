@@ -4,6 +4,8 @@ import com.project.backend.entity.User;
 import com.project.backend.repository.UserRegistrationService;
 import com.project.backend.repository.UserRepository;
 import com.project.backend.security.PrincipalDetails;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+
     private final UserRegistrationService userRegistrationService; // 인터페이스 사용
 
     public OAuth2MemberService(UserRepository userRepository, UserRegistrationService userRegistrationService) {

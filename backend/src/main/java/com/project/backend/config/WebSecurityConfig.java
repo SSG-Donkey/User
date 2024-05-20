@@ -3,6 +3,7 @@ package com.project.backend.config;
 import com.project.backend.jwt.JwtAuthFilter;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -26,7 +27,7 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private final OAuth2MemberService oAuth2MemberService;
+    private final @Lazy OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
 
 
