@@ -29,6 +29,7 @@ public class WebSecurityConfig {
     private final OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
