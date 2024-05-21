@@ -64,7 +64,7 @@ public class WebSecurityConfig {
                 .and()
                 .oauth2Login()
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
-                .defaultSuccessUrl("/", true)  // 수정된 부분: 기본 성공 URL 설정
+                .defaultSuccessUrl("/", true)
                 .userInfoEndpoint()
                 .userService(oAuth2MemberService)
                 .and()
