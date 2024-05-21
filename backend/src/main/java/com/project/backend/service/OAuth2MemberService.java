@@ -1,7 +1,6 @@
 package com.project.backend.service;
 
 import com.project.backend.entity.User;
-import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
 import com.project.backend.security.PrincipalDetails;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -11,20 +10,17 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
     private final UserRegistrationService userRegistrationService;
 
-    public OAuth2MemberService(UserRepository userRepository, UserRegistrationService userRegistrationService, JwtUtil jwtUtil) {
+    public OAuth2MemberService(UserRepository userRepository, UserRegistrationService userRegistrationService) {
         this.userRepository = userRepository;
         this.userRegistrationService = userRegistrationService;
-        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -36,14 +32,9 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> userRegistrationService.registerNewUser(attributes));
 
-        // JWT 토큰 생성 및 세팅
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
-        attributes.put("token", token);  // 토큰을 attributes에 추가
-
-
+        // 바로 로그인 처리를 위해 비밀번호 체크 없이 사용자 세부정보 반환
         return new PrincipalDetails(user, attributes);
     }
-
 
     @Transactional
     public void updateUserLoginDetails(String email, Map<String, Object> attributes) {
