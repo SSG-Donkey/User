@@ -73,6 +73,7 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 탈퇴 완료")})
     @DeleteMapping("/user/{userId}")
     public ResponseMsgDto deleteUser(@PathVariable Long userId) {
+        log.info("회원탈퇴 controller 실행");
         return userService.deleteUser(userId);
     }
 }
