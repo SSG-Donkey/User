@@ -112,6 +112,7 @@ public class UserService {
         data.put("password", user.getPassword());
         data.put("email", user.getEmail());
         data.put("bankNo", user.getBankNo());
+        data.put("account", user.getAccount());
         data.put("userId", user.getId());
         data.put("username", user.getUsername());
 
