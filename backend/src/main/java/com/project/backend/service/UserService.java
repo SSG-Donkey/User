@@ -112,7 +112,6 @@ public class UserService {
         data.put("password", user.getPassword());
         data.put("email", user.getEmail());
         data.put("bankNo", user.getBankNo());
-        data.put("account", user.getAccount());
         data.put("userId", user.getId());
         data.put("username", user.getUsername());
 
@@ -166,11 +165,6 @@ public class UserService {
 
         // 계좌 번호 업데이트
         if (updateUserInfoRequestDto.getNewAccount() != null) {
-            userRepository.findByAccount(updateUserInfoRequestDto.getNewAccount()).ifPresent(u -> {
-                if (!u.getId().equals(userId)) { // 같은 ID가 아닐 경우에만 예외 처리
-                    throw new CustomException(ErrorCode.EXIST_USERACCOUNT);
-                }
-            });
             user.setAccount(updateUserInfoRequestDto.getNewAccount());
         }
 

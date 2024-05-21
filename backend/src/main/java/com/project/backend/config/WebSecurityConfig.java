@@ -3,9 +3,6 @@ package com.project.backend.config;
 import com.project.backend.jwt.JwtAuthFilter;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -29,11 +26,8 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
+    private final OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
-    @Autowired
-    private final ApplicationContext applicationContext;  // 추가: ApplicationContext 사용
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,13 +36,14 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("https://www.dangnagwi.store"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
         configuration.setAllowCredentials(true);
@@ -61,27 +56,26 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2MemberService oAuth2MemberService = applicationContext.getBean(OAuth2MemberService.class);  // 서비스 동적 로딩
-        http.cors()
-                .configurationSource(corsConfigurationSource())
-                .and()
-                .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .and()
                 .oauth2Login()
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
-                .defaultSuccessUrl("https://www.dangnagwi.store")
+                .defaultSuccessUrl("/", true)  // 수정된 부분: 기본 성공 URL 설정
                 .userInfoEndpoint()
                 .userService(oAuth2MemberService)
                 .and()
+                .successHandler((request, response, authentication) -> {
+                    OAuth2MemberService.PrincipalDetails principalDetails = (OAuth2MemberService.PrincipalDetails) authentication.getPrincipal();
+                    String token = principalDetails.getToken();
+                    response.sendRedirect("https://www.dangnagwi.store?token=" + token);
+                })
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 }
-
