@@ -1,4 +1,4 @@
-package com.project.backend.repository;
+package com.project.backend.service;
 
 import com.project.backend.entity.User;
 
