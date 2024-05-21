@@ -59,6 +59,13 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 정보 업데이트 완료")})
     @PutMapping("/user/{userId}/updateInfo")
     public ResponseMsgDto updateUserInfo(@PathVariable Long userId, @Valid @RequestBody UpdateUserInfoRequestDto updateUserInfoRequestDto) {
+
+        log.info("----------------------테스트---------------------");
+        log.info("이메일 " + updateUserInfoRequestDto.getNewEmail());
+        log.info("은행" + updateUserInfoRequestDto.getNewBankNo());
+        log.info("계좌번호" + updateUserInfoRequestDto.getNewAccount());
+        log.info("----------------------테스트 끝---------------------");
+
         return userService.updateUserInfo(userId, updateUserInfoRequestDto);
     }
 
@@ -66,6 +73,7 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 탈퇴 완료")})
     @DeleteMapping("/user/{userId}")
     public ResponseMsgDto deleteUser(@PathVariable Long userId) {
+        log.info("회원탈퇴 controller 실행");
         return userService.deleteUser(userId);
     }
 }
