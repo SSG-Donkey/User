@@ -1,11 +1,9 @@
 package com.project.backend.config;
 
 import com.project.backend.jwt.JwtAuthFilter;
+import com.project.backend.security.PrincipalDetails;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -24,16 +22,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
+    private final OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
-    @Autowired
-    private final ApplicationContext applicationContext;  // 추가: ApplicationContext 사용
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,13 +38,14 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("https://www.dangnagwi.store"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
         configuration.setAllowCredentials(true);
@@ -61,27 +58,31 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2MemberService oAuth2MemberService = applicationContext.getBean(OAuth2MemberService.class);  // 서비스 동적 로딩
-        http.cors()
-                .configurationSource(corsConfigurationSource())
-                .and()
-                .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests()
                 .antMatchers("/**").permitAll()
-                .and()
-                .oauth2Login()
+                .and().oauth2Login()
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
-                .defaultSuccessUrl("https://www.dangnagwi.store")
-                .userInfoEndpoint()
-                .userService(oAuth2MemberService)
+                .successHandler((request, response, authentication) -> {
+                    PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+                    String token = principalDetails.getToken();
+                    Long userId = principalDetails.getUserId();
+                    Long account= principalDetails.getAccount();
+                    Long bankNo = principalDetails.getBankNo();
+                    String username = principalDetails.getUsername();
+                    String nickname = principalDetails.getNickname();
+                    String email = principalDetails.getEmail();
+
+                    String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token + "&userId=" + userId + "&email=" + email + "&username=" + username
+                            + "&nickname=" + nickname + "&account=" + account + "&bankNo=" + bankNo;
+                    response.sendRedirect(redirectUrl);
+                })
+                .userInfoEndpoint().userService(oAuth2MemberService)
                 .and()
-                .and()
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 }
-
