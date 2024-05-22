@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -43,7 +44,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("https://www.dangnagwi.store"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
         configuration.setAllowCredentials(true);
@@ -54,33 +55,20 @@ public class WebSecurityConfig {
         return source;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/user/auth/status").permitAll() // 이 엔드포인트는 인증 없이 접근 허용
                 .antMatchers("/**").permitAll()
-                .and()
-                .oauth2Login()
+                .and().oauth2Login()
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
-                .defaultSuccessUrl("/", true)
-                .userInfoEndpoint()
-                .userService(oAuth2MemberService)
+                .defaultSuccessUrl("/loginSuccess")
+                .userInfoEndpoint().userService(oAuth2MemberService)
                 .and()
-                .successHandler((request, response, authentication) -> {
-                    OAuth2MemberService.PrincipalDetails principalDetails = (OAuth2MemberService.PrincipalDetails) authentication.getPrincipal();
-                    String token = principalDetails.getToken();
-                    System.out.println("Login Success, Token: " + token); // 로그인 성공 후 토큰 출력
-                    response.addHeader("Authorization", "Bearer " + token); // HTTP 헤더에 토큰 추가
-                    response.sendRedirect("https://www.dangnagwi.store"); // 프론트엔드로 리디렉션
-                })
-                .and()
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

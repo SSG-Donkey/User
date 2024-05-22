@@ -3,7 +3,6 @@ package com.project.backend.controller;
 
 import com.project.backend.dto.*;
 import com.project.backend.security.PrincipalDetails;
-import com.project.backend.service.OAuth2MemberService;
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,17 +10,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Map;
 
 @Tag(name = "userController", description = "유저관리 API")
 @RestController
@@ -72,16 +67,13 @@ public class UserController {
         return userService.deleteUser(userId);
     }
 
-
-    @GetMapping("/auth/status")
-    public ResponseEntity<?> getAuthStatus(HttpServletRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            String token = request.getHeader("Authorization");
-            return ResponseEntity.ok().header("Authorization", token).body("Authenticated");
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+    @GetMapping("/loginSuccess")
+    public ResponseEntity<?> loginSuccess(Authentication authentication) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        String token = principalDetails.getToken();
+        return ResponseEntity.ok().body(Map.of(
+                "token", token,
+                "email", principalDetails.getUsername()
+        ));
     }
-
-
 }

@@ -72,6 +72,10 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-oauth2-core:5.7.2'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
+
+	compileOnly 'org.projectlombok:lombok:1.18.20'
+	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
 }
 
 dependencyManagement {
