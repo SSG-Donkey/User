@@ -1,6 +1,7 @@
 package com.project.backend.config;
 
 import com.project.backend.jwt.JwtAuthFilter;
+import com.project.backend.security.PrincipalDetails;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -64,7 +65,12 @@ public class WebSecurityConfig {
                 .antMatchers("/**").permitAll()
                 .and().oauth2Login()
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
-                .defaultSuccessUrl("/loginSuccess")
+                .successHandler((request, response, authentication) -> {
+                    PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+                    String token = principalDetails.getToken();
+                    String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token;
+                    response.sendRedirect(redirectUrl);
+                })
                 .userInfoEndpoint().userService(oAuth2MemberService)
                 .and()
                 .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

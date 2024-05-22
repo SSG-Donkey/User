@@ -68,11 +68,4 @@ public class UserController {
         return userService.deleteUser(userId);
     }
 
-    @GetMapping("/loginSuccess")
-    public void loginSuccess(Authentication authentication, HttpServletResponse response) throws IOException {
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        String token = principalDetails.getToken();
-        String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token;
-        response.sendRedirect(redirectUrl);
-    }
 }
