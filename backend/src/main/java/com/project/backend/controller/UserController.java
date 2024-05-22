@@ -2,6 +2,7 @@ package com.project.backend.controller;
 
 
 import com.project.backend.dto.*;
+import com.project.backend.security.PrincipalDetails;
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,8 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -62,4 +67,18 @@ public class UserController {
     public ResponseMsgDto deleteUser(@PathVariable Long userId) {
         return userService.deleteUser(userId);
     }
+
+
+    // 인증 상태 확인 엔드포인트 추가
+    @Operation(summary = "인증 상태 확인 API", description = "현재 사용자의 인증 상태를 확인합니다.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "인증 상태 확인 완료")})
+    @GetMapping("/auth/status")
+    public ResponseEntity<?> getAuthStatus(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if (principalDetails != null) {
+            String token = request.getHeader("Authorization");
+            return ResponseEntity.ok().header("Authorization", token).body("Authenticated");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+    }
+
 }
