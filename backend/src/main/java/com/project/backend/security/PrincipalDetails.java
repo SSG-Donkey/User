@@ -14,13 +14,12 @@ import java.util.Collections;
 import java.util.Map;
 
 
+@Getter
+@Setter
 public class PrincipalDetails implements OAuth2User, UserDetails {
 
     private User user;
     private Map<String, Object> attributes;
-
-    @Getter
-    @Setter
     private String token;
 
     public PrincipalDetails(User user) {
