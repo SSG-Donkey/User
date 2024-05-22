@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,16 +73,15 @@ public class UserController {
     }
 
 
-    // 인증 상태 확인 엔드포인트 추가
-    @Operation(summary = "인증 상태 확인 API", description = "현재 사용자의 인증 상태를 확인합니다.")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "인증 상태 확인 완료")})
     @GetMapping("/auth/status")
-    public ResponseEntity<?> getAuthStatus(HttpServletRequest request, @AuthenticationPrincipal OAuth2MemberService.PrincipalDetails principalDetails) {
-        if (principalDetails != null) {
+    public ResponseEntity<?> getAuthStatus(HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
             String token = request.getHeader("Authorization");
             return ResponseEntity.ok().header("Authorization", token).body("Authenticated");
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
     }
+
 
 }
