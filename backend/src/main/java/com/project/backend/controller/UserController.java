@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Map;
 
 @Tag(name = "userController", description = "유저관리 API")
@@ -68,12 +69,10 @@ public class UserController {
     }
 
     @GetMapping("/loginSuccess")
-    public ResponseEntity<?> loginSuccess(Authentication authentication) {
+    public void loginSuccess(Authentication authentication, HttpServletResponse response) throws IOException {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String token = principalDetails.getToken();
-        return ResponseEntity.ok().body(Map.of(
-                "token", token,
-                "email", principalDetails.getUsername()
-        ));
+        String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token;
+        response.sendRedirect(redirectUrl);
     }
 }
