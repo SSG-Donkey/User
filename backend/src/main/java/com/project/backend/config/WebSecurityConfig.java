@@ -70,9 +70,11 @@ public class WebSecurityConfig {
                     String token = principalDetails.getToken();
                     String nickname = principalDetails.getUser().getNickname();
                     String email = principalDetails.getUser().getEmail();
+                    Long bankNo = principalDetails.getUser().getBankNo();
+                    Long account = principalDetails.getUser().getAccount();
                     Long userId = principalDetails.getUser().getId();
-                    String redirectUrl = String.format("https://www.dangnagwi.store/loginForm.html?token=%s&nickname=%s&email=%s&userId=%d",
-                            token, nickname, email, userId);
+                    String redirectUrl = String.format("https://www.dangnagwi.store/loginForm.html?token=%s&nickname=%s&email=%s&bankNo=%d&account=%d&userId=%d",
+                            token, nickname, email, bankNo, account, userId);
                     response.sendRedirect(redirectUrl);
                 })
                 .userInfoEndpoint().userService(oAuth2MemberService)
