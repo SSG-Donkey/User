@@ -21,17 +21,36 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     private User user;
     private Map<String, Object> attributes;
     private String token;
+    private String email;
+    private String username;
+    private String nickname;
     private Long userId;
+    private Long account;
+    private Long bankNo;
+
+
+
 
     public PrincipalDetails(User user) {
         this.user = user;
         this.userId = user.getId();
+        this.email = user.getEmail();
+        this.nickname = user.getNickname();
+        this.username = user.getUsername();
+        this.account = user.getAccount();
+        this.bankNo = user.getBankNo();
+
     }
 
     public PrincipalDetails(User user, Map<String, Object> attributes) {
         this.user = user;
         this.attributes = attributes;
         this.userId = user.getId();
+        this.email = user.getEmail();
+        this.nickname = user.getNickname();
+        this.username = user.getUsername();
+        this.account = user.getAccount();
+        this.bankNo = user.getBankNo();
     }
 
     @Override
