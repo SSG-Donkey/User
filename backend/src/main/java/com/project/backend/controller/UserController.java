@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.*;
+import com.project.backend.service.KakaoAuthService;
 import com.project.backend.service.OAuth2MemberService;
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,11 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Map;
@@ -27,6 +31,8 @@ public class UserController {
 
     private final UserService userService;
     private final OAuth2MemberService oAuth2MemberService;
+    @Setter(onMethod_ = @Autowired)
+    private KakaoAuthService kakaoAuthService;
 
     @Operation(summary = "회원가입 API", description = "회원가입")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 가입 완료")})
@@ -39,7 +45,7 @@ public class UserController {
     @Operation(summary = "로그인 API", description = "로그인 성공시 jwt 토큰을 헤더에 넣어 반환합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "로그인 완료")})
     @PostMapping("/login")
-    public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
+    public ResponseMsgDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         return userService.login(loginRequestDto, response);
     }
 
@@ -54,6 +60,32 @@ public class UserController {
         ModelAndView mav = new ModelAndView("redirect:/");
         return mav;
     }
+
+    // 카카오 로그인
+    @GetMapping("/kakaoAuth")
+    public String kakaoAuth(@RequestParam("code") String code) {
+
+        if (code != null) {
+            log.info("인가코드 존재 : " + code);
+            KakaoUserDto user = kakaoAuthService.getUserInfo(code);
+            log.info("----------------- DTO -------------------------");
+            log.info("TokenType : " + user.getToken_type());
+            log.info("AccessToken : " + user.getAccess_token());
+            log.info("RefreshToken : " + user.getRefresh_token());
+            log.info("id_token : " + user.getId_token());
+            log.info("-----------------------------------------------");
+            return user.getId_token();
+        }
+        return null;
+    }
+
+    // 유저 정보 받아오기
+    @PostMapping("/kakaoLogin")
+    public SignupRequestDto kakaoLogin(HttpServletResponse response) {
+        log.info("kakao/login 진입");
+        return null;
+    }
+
 
     @Operation(summary = "회원 정보 업데이트 API", description = "사용자의 닉네임, 비밀번호, 및 은행 정보를 업데이트합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 정보 업데이트 완료")})
