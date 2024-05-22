@@ -1,5 +1,6 @@
-package com.project.backend.config;
+package com.project.backend.utils;
 
+import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
@@ -7,18 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import lombok.RequiredArgsConstructor;
-
 @RequiredArgsConstructor
 @Configuration
 public class JasyptConfig {
 
-    @Value("218905C7CD2C857E34E95E8FB59C0DDE3DCBFB97")
+    @Value("${jasypt.encryptor.password}")
     private String PASSWORD_KEY;
 
     private static final String ALGORITHM = "PBEWithMD5AndDES";
-
-
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
