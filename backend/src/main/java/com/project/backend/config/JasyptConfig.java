@@ -1,4 +1,4 @@
-package com.project.backend.utils;
+package com.project.backend.config;
 
 import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.StringEncryptor;
