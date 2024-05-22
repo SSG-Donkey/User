@@ -32,7 +32,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = jwtUtil.resolveToken(request);
 
         if (token != null) {
+            log.info("JWT token found in request headers: " + token);
             if (!jwtUtil.validateToken(token)) {
+                log.error("Invalid JWT token");
                 jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
                 return;
             }
@@ -64,3 +66,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
     }
 }
+

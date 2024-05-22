@@ -54,6 +54,7 @@ public class WebSecurityConfig {
         return source;
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -81,4 +82,5 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+
 }
