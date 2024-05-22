@@ -34,10 +34,13 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String email = (String) attributes.get("email");
+        System.out.println("OAuth2 Login Attempt: Email=" + email); // 로그인 시도 로그
+
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
 
         String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        System.out.println("Generated Token: " + token); // 토큰 생성 로그
 
         return new PrincipalDetails(user, attributes, token);
     }
