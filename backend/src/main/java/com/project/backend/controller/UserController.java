@@ -3,6 +3,7 @@ package com.project.backend.controller;
 
 import com.project.backend.dto.*;
 import com.project.backend.security.PrincipalDetails;
+import com.project.backend.service.OAuth2MemberService;
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -73,7 +74,7 @@ public class UserController {
     @Operation(summary = "인증 상태 확인 API", description = "현재 사용자의 인증 상태를 확인합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "인증 상태 확인 완료")})
     @GetMapping("/auth/status")
-    public ResponseEntity<?> getAuthStatus(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<?> getAuthStatus(HttpServletRequest request, @AuthenticationPrincipal OAuth2MemberService.PrincipalDetails principalDetails) {
         if (principalDetails != null) {
             String token = request.getHeader("Authorization");
             return ResponseEntity.ok().header("Authorization", token).body("Authenticated");

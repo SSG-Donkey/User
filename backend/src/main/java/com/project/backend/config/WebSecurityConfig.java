@@ -60,6 +60,7 @@ public class WebSecurityConfig {
                 .csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
+                .antMatchers("/user/auth/status").permitAll() // 이 엔드포인트는 인증 없이 접근 허용
                 .antMatchers("/**").permitAll()
                 .and()
                 .oauth2Login()
