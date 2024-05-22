@@ -71,7 +71,7 @@ public class WebSecurityConfig {
                     String nickname = principalDetails.getUser().getNickname();
                     String email = principalDetails.getUser().getEmail();
                     Long userId = principalDetails.getUser().getId();
-                    String redirectUrl = String.format("https://www.dangnagwi.store/loginForm.html?token=%s&nickname=%s&email=%s&userId=%d",
+                    String redirectUrl = String.format("https://www.dangnagwi.store/mypage.html?token=%s&nickname=%s&email=%s&userId=%d",
                             token, nickname, email, userId);
                     response.sendRedirect(redirectUrl);
                 })
