@@ -71,9 +71,11 @@ public class WebSecurityConfig {
                 .successHandler((request, response, authentication) -> {
                     OAuth2MemberService.PrincipalDetails principalDetails = (OAuth2MemberService.PrincipalDetails) authentication.getPrincipal();
                     String token = principalDetails.getToken();
+                    System.out.println("Generated Token: " + token); // 토큰 출력 로그
                     response.addHeader("Authorization", "Bearer " + token); // HTTP 헤더에 토큰 추가
                     response.sendRedirect("https://www.dangnagwi.store"); // 프론트엔드로 리디렉션
                 })
+
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
