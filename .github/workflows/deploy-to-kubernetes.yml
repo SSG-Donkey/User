@@ -23,7 +23,8 @@ jobs:
         working-directory: ./backend
 
       - name: Set Jasypt Encryptor Password
-        run: echo "jasypt.encryptor.password=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}" >> ./src/main/resources/application.properties
+        run: |
+          printf "\njasypt.encryptor.password=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}" >> ./src/main/resources/application.properties
         working-directory: ./backend
 
       - name: Build with Gradle
