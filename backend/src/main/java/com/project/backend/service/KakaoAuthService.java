@@ -33,7 +33,7 @@ public class KakaoAuthService {
         // body
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "bbdfe22726c4cbce4bb5020c4c988a3cstat");
+        body.add("client_id", "bbdfe22726c4cbce4bb5020c4c988a3c");
         body.add("redirect_uri", "https://www.dangnagwi.store/user/kakaoLogin");
         body.add("code", code);
         log.info("바디 : " + body);
