@@ -43,9 +43,6 @@ public class User {
     private UserRoleEnum role;
 
 
-    @Column(nullable = false)
-    private boolean isNewUser = true; // 기본값을 true로 설정하여 신규 유저로 간주
-
     // 생성자에서 role 파라미터를 제외하고 기본값을 설정
     public User(String nickname, String username, String password, String email, Long bankNo, Long account) {
         this.nickname = nickname;
@@ -55,7 +52,6 @@ public class User {
         this.bankNo = bankNo;
         this.account = account;
         this.role = UserRoleEnum.USER; // 기본 권한을 USER로 설정
-
     }
 
     // BankNo 설정
@@ -90,16 +86,6 @@ public class User {
     // Role 가져오기
     public UserRoleEnum getRole() {
         return role;
-    }
-
-
-    // Getter, Setter
-    public boolean isNewUser() {
-        return isNewUser;
-    }
-
-    public void setNewUser(boolean newUser) {
-        isNewUser = newUser;
     }
 
 

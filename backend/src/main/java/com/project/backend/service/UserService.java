@@ -102,8 +102,7 @@ public class UserService {
         }
 
         // JWT 토큰 생성
-        boolean isNewUser = user.isNewUser(); // 신규 유저 여부 저장
-        String token = jwtUtil.createToken(user, isNewUser); // 두 개의 인자 전달
+        String token = jwtUtil.createToken(user);
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
 
         // 응답 데이터에 사용자 정보 추가
@@ -115,13 +114,6 @@ public class UserService {
         data.put("account", user.getAccount());
         data.put("userId", user.getId());
         data.put("username", user.getUsername());
-        data.put("isNewUser", isNewUser);
-
-        // 첫 로그인 이후에는 isNewUser를 false로 변경
-        if (isNewUser) {
-            user.setNewUser(false);
-            userRepository.save(user);
-        }
 
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "로그인 성공", data);
     }

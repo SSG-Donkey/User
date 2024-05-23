@@ -52,7 +52,7 @@ public class JwtUtil {
         return null;
     }
 
-    public String createToken(User user, boolean isNewUser) {
+    public String createToken(User user) {
         Date now = new Date();
         return Jwts.builder()
                 .setSubject(user.getUsername())
@@ -61,7 +61,6 @@ public class JwtUtil {
                 .claim("email", user.getEmail())
                 .claim("account", user.getAccount())
                 .claim("bankNo", user.getBankNo())
-                .claim("isNewUser", isNewUser)  // 신규 유저 정보 추가
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_TIME))
                 .signWith(key, signatureAlgorithm)
