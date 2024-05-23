@@ -36,6 +36,7 @@ public class KakaoAuthService {
         body.add("client_id", "bbdfe22726c4cbce4bb5020c4c988a3c");
         body.add("redirect_uri", "https://www.dangnagwi.store/user/kakaoLogin");
         body.add("code", code);
+        body.add("client_secret","6uBd61JFuIXArjlUPDaTdAma8suYgoA1");
         log.info("바디 : " + body);
 
         // header + body
