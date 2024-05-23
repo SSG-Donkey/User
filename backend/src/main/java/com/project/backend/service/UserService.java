@@ -185,6 +185,12 @@ public class UserService {
         return ResponseMsgDto.setSuccess(HttpStatus.OK.value(), "회원 탈퇴 처리가 완료되었습니다.", null);
     }
 
+    // 사용자 존재 여부 확인 메서드 추가
+    @Transactional(readOnly = true)
+    public boolean checkUserExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 
 
 
