@@ -101,15 +101,22 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        // JWT 토큰 생성 시 추가 정보 포함
+        String token = jwtUtil.createToken(
+                user.getUsername(),
+                user.getRole(),
+                user.getId(),
+                user.getNickname(),
+                user.getEmail(),
+                user.getBankNo(),
+                user.getAccount()
+        );
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer " + token);
 
         // 응답 데이터에 닉네임 추가
         Map<String, Object> data = new HashMap<>();
         data.put("token", token);
         data.put("nickname", user.getNickname());
-        data.put("password", user.getPassword());
         data.put("email", user.getEmail());
         data.put("bankNo", user.getBankNo());
         data.put("userId", user.getId());

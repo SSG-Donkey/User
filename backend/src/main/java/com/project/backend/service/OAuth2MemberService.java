@@ -13,26 +13,31 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class OAuth2MemberService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+
+    public OAuth2MemberService(UserRepository userRepository, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+
         String email = (String) attributes.get("email");
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
 
-        // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.createToken(user.getEmail(), user.getRole(), user.getId(), user.getNickname(), user.getEmail(), user.getBankNo(), user.getAccount());
 
         PrincipalDetails principalDetails = new PrincipalDetails(user, attributes);
         principalDetails.setToken(token);
+
         return principalDetails;
     }
 
