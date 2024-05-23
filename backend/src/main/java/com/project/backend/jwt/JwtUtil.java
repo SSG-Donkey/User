@@ -1,9 +1,9 @@
 package com.project.backend.jwt;
 
+import com.project.backend.entity.User;
 import com.project.backend.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecurityException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,6 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    // header 토큰을 가져오기
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
@@ -53,51 +52,39 @@ public class JwtUtil {
         return null;
     }
 
-    // 토큰 생성
-    public String createToken(String username, UserRoleEnum role, Long userId, String nickname, String email, Long bankNo, Long account) {
+    public String createToken(User user) {
         Date now = new Date();
-
         return Jwts.builder()
-                .setSubject(username)
-                .claim(AUTHORIZATION_KEY, role)
-                .claim("userId", userId)
-                .claim("nickname", nickname)
-                .claim("email", email)
-                .claim("bankNo", bankNo)
-                .claim("account", account)
+                .setSubject(user.getUsername())
+                .claim("userId", user.getId())
+                .claim("nickname", user.getNickname())
+                .claim("email", user.getEmail())
+                .claim("account", user.getAccount())
+                .claim("bankNo", user.getBankNo())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_TIME))
                 .signWith(key, signatureAlgorithm)
                 .compact();
     }
 
-    // 토큰 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token, 만료된 JWT token 입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+        } catch (Exception e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
-    // 인증 객체 생성
     public Authentication createAuthentication(String username) {
         UserDetailsService userDetailsService = getUserDetailsService();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     private UserDetailsService getUserDetailsService() {

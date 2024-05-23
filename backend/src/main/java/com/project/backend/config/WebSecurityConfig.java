@@ -1,7 +1,6 @@
 package com.project.backend.config;
 
 import com.project.backend.jwt.JwtAuthFilter;
-import com.project.backend.jwt.JwtUtil;
 import com.project.backend.security.PrincipalDetails;
 import com.project.backend.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 public class WebSecurityConfig {
     private final OAuth2MemberService oAuth2MemberService;
     private final JwtAuthFilter jwtAuthFilter;
-    private final JwtUtil jwtUtil;  // 추가
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -69,17 +67,9 @@ public class WebSecurityConfig {
                 .loginPage("https://www.dangnagwi.store/loginForm.html")
                 .successHandler((request, response, authentication) -> {
                     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-                    // JWT 토큰 생성 및 포함할 사용자 정보
-                    String token = jwtUtil.createToken(
-                            principalDetails.getUsername(),
-                            principalDetails.getUser().getRole(),
-                            principalDetails.getUser().getId(),
-                            principalDetails.getUser().getNickname(),
-                            principalDetails.getUser().getEmail(),
-                            principalDetails.getUser().getBankNo(),
-                            principalDetails.getUser().getAccount()
-                    );
-                    String redirectUrl = "https://www.dangnagwi.store/mypage.html?token=" + token;
+                    String token = principalDetails.getToken();
+
+                    String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token;
                     response.sendRedirect(redirectUrl);
                 })
                 .userInfoEndpoint().userService(oAuth2MemberService)
