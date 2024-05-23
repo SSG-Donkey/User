@@ -101,4 +101,13 @@ public class UserController {
         return userService.deleteUser(userId);
     }
 
+    // 사용자 존재 여부 확인 API
+    @Operation(summary = "사용자 존재 여부 확인 API", description = "이메일로 사용자 존재 여부를 확인합니다.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "사용자 존재 여부 확인 완료")})
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> checkUserExists(@RequestParam String email) {
+        boolean exists = userService.checkUserExists(email);
+        return ResponseEntity.ok(exists);
+    }
+
 }
