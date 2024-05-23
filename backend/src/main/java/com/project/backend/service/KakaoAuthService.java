@@ -49,7 +49,7 @@ public class KakaoAuthService {
                 kakaoTokenRequest,
                 KakaoUserDto.class
         );
-        log.info("user Request: " + response.getStatusCode());
+        log.info("request Status : " + response.getStatusCode());
 
         return response.getBody();
     }

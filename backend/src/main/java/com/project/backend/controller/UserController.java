@@ -64,10 +64,12 @@ public class UserController {
             log.info("인가코드 존재 : " + code);
             KakaoUserDto user = kakaoAuthService.getUserInfo(code);
             log.info("----------------- DTO -------------------------");
+            log.info(user.toString());
             log.info("TokenType : " + user.getToken_type());
             log.info("AccessToken : " + user.getAccess_token());
             log.info("RefreshToken : " + user.getRefresh_token());
             log.info("id_token : " + user.getId_token());
+            log.info("scope : "+user.getScope());
             log.info("-----------------------------------------------");
             return user.getId_token();
         }
