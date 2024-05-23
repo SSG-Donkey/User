@@ -21,6 +21,8 @@ public class KakaoAuthService {
 
     // Token 및 UserInfo가져오기
     public KakaoUserDto getUserInfo(String code) {
+
+        String host = "https://kauth.kakao.com/oauth/token";
         RestTemplate restTemplate = new RestTemplate();
 
         // header
@@ -41,7 +43,7 @@ public class KakaoAuthService {
         log.info("user Request: " + kakaoTokenRequest);
 
         ResponseEntity<KakaoUserDto> response = restTemplate.exchange(
-                "{#token-uri}",
+                host,
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 KakaoUserDto.class
