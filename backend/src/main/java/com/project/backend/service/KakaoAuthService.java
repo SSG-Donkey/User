@@ -18,33 +18,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Log
 public class KakaoAuthService {
-    private KakaoUserDto kakaoUserDto;
-
-    private static final String CLIENT_ID = "bbdfe22726c4cbce4bb5020c4c988a3c";
-    private static final String REDIRECT_URI = "http://localhost:8080/user/kakaoAuth";
-
-    //인가코드 받기
-    public String getAuth() {
-        RestTemplate restTemplate = new RestTemplate();
-        log.info("kakaoAuth 진입");
-
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromUriString("https://kauth.kakao.com/oauth/authorize")
-                .queryParam("client_id", CLIENT_ID)
-                .queryParam("redirect_uri", REDIRECT_URI)
-                .queryParam("response_type", "code");
-        String url = builder.build().toString();
-        String auth = restTemplate.getForObject(url, String.class);
-
-        log.info("auth 값 : " + auth);
-
-        return auth;
-    }
 
     // Token 및 UserInfo가져오기
     public KakaoUserDto getUserInfo(String code) {
-        log.info("getUserInfo의 code: " + code);
-        String host = "https://kauth.kakao.com/oauth/token";
         RestTemplate restTemplate = new RestTemplate();
 
         // header
@@ -54,9 +30,9 @@ public class KakaoAuthService {
 
         // body
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_code");
-        body.add("client_id", CLIENT_ID);
-        body.add("redirect_uri", "http://localhost:8080/user/kakaoAuth");
+        body.add("grant_type", "{#authorization-grant-type}");
+        body.add("client_id", "{#client_id}");
+        body.add("redirect_uri", "https://www.dangnagwi.store/user/kakaoLogin");
         body.add("code", code);
         log.info("바디 : " + body);
 
@@ -65,7 +41,7 @@ public class KakaoAuthService {
         log.info("user Request: " + kakaoTokenRequest);
 
         ResponseEntity<KakaoUserDto> response = restTemplate.exchange(
-                host,
+                "{#token-uri}",
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 KakaoUserDto.class

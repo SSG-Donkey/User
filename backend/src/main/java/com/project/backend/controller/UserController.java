@@ -74,10 +74,13 @@ public class UserController {
         return null;
     }
 
-    // 유저 정보 받아오기
+    // Token, 유저 정보 받아오기
     @PostMapping("/kakaoLogin")
     public SignupRequestDto kakaoLogin(HttpServletResponse response) {
+        // 유저 정보 에서 nick_name 받아와서 loaduser()
+        // 정보 없으면 createUser(profile_nickname, account_email)
         log.info("kakao/login 진입");
+
         return null;
     }
 
