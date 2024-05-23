@@ -48,6 +48,7 @@ public class KakaoAuthService {
                 kakaoTokenRequest,
                 KakaoUserDto.class
         );
+        log.info("user Request: " + response);
 
         return response.getBody();
     }
