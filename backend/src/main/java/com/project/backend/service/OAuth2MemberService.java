@@ -30,7 +30,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
                 .orElseGet(() -> createUser(email, attributes));
 
         // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.createToken(user);
 
         PrincipalDetails principalDetails = new PrincipalDetails(user, attributes);
         principalDetails.setToken(token);

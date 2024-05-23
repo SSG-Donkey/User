@@ -68,15 +68,8 @@ public class WebSecurityConfig {
                 .successHandler((request, response, authentication) -> {
                     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
                     String token = principalDetails.getToken();
-                    Long userId = principalDetails.getUserId();
-                    Long account= principalDetails.getAccount();
-                    Long bankNo = principalDetails.getBankNo();
-                    String username = principalDetails.getUsername();
-                    String nickname = principalDetails.getNickname();
-                    String email = principalDetails.getEmail();
 
-                    String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token + "&userId=" + userId + "&email=" + email + "&username=" + username
-                            + "&nickname=" + nickname + "&account=" + account + "&bankNo=" + bankNo;
+                    String redirectUrl = "https://www.dangnagwi.store/loginForm.html?token=" + token;
                     response.sendRedirect(redirectUrl);
                 })
                 .userInfoEndpoint().userService(oAuth2MemberService)

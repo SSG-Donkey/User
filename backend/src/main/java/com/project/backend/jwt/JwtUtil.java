@@ -1,9 +1,9 @@
 package com.project.backend.jwt;
 
+import com.project.backend.entity.User;
 import com.project.backend.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecurityException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,11 +52,15 @@ public class JwtUtil {
         return null;
     }
 
-    public String createToken(String username, UserRoleEnum role) {
+    public String createToken(User user) {
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(username)
-                .claim(AUTHORIZATION_KEY, role.name())
+                .setSubject(user.getUsername())
+                .claim("userId", user.getId())
+                .claim("nickname", user.getNickname())
+                .claim("email", user.getEmail())
+                .claim("account", user.getAccount())
+                .claim("bankNo", user.getBankNo())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_TIME))
                 .signWith(key, signatureAlgorithm)
