@@ -14,17 +14,6 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
 
     }
 
-
-    @Override
-    public String getProviderId() {
-        return attributes.get("id").toString();
-    }
-
-    @Override
-    public String getProvider() {
-        return "kakao";
-    }
-
     @Override
     public String getName() {
         return kakaoAccountAttributes.get("nickname").toString();

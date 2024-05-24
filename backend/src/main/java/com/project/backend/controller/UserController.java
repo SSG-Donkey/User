@@ -52,9 +52,6 @@ public class UserController {
     }
 
 
-
-
-
     //회원정보 수정
     @Operation(summary = "회원 정보 업데이트 API", description = "사용자의 닉네임, 비밀번호, 및 은행 정보를 업데이트합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 정보 업데이트 완료")})
@@ -67,7 +64,6 @@ public class UserController {
     }
 
     //회원탈퇴
-
     @Operation(summary = "회원 탈퇴 API", description = "사용자의 계정을 삭제합니다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 탈퇴 완료")})
     @DeleteMapping("/user/{userId}")
