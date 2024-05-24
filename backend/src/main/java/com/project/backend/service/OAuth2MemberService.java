@@ -46,6 +46,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String email = memberInfo.getEmail();
 
         log.info("사용자 정보 : " + memberInfo);
+        log.info("사용자 이름 : " + memberInfo.getName());
         log.info("사용자 Email : " + memberInfo.getEmail());
 
         User user = userRepository.findByEmail(email)
