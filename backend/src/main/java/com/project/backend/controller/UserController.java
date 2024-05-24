@@ -2,7 +2,6 @@ package com.project.backend.controller;
 
 
 import com.project.backend.dto.*;
-import com.project.backend.service.KakaoAuthService;
 import com.project.backend.service.OAuth2MemberService;
 
 import com.project.backend.service.UserService;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Map;
 
 
 @Tag(name = "userController", description = "유저관리 API")
@@ -33,8 +31,6 @@ public class UserController {
 
     private final UserService userService;
     private final OAuth2MemberService oAuth2MemberService;
-    @Setter(onMethod_ = @Autowired)
-    private KakaoAuthService kakaoAuthService;
 
     @Operation(summary = "회원가입 API", description = "회원가입")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "회원 가입 완료")})
@@ -56,29 +52,7 @@ public class UserController {
     }
 
 
-    // 카카오 로그인
-    @GetMapping("/kakaoAuth")
-    public String kakaoAuth(@RequestParam("code") String code) {
-        if (code != null) {
-            log.info("인가코드 존재 : " + code);
-            KakaoUserDto user = kakaoAuthService.getUserToken(code);
 
-            log.info("----------------- DTO -------------------------");
-            log.info(user.toString());
-            log.info("TokenType : " + user.getToken_type());
-            log.info("AccessToken : " + user.getAccess_token());
-            log.info("RefreshToken : " + user.getRefresh_token());
-            log.info("id_token : " + user.getId_token());
-            log.info("scope : " + user.getScope());
-            log.info("-----------------------------------------------");
-
-            // 유저 정보가 db에 존재 하면 userService.logoin(), 없으면 userService.signup
-            return null;
-        }
-
-
-        return null;
-    }
 
 
     //회원정보 수정
