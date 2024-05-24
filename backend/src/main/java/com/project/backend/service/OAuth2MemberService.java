@@ -32,10 +32,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         OAuth2MemberInfo memberInfo = null;
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        String name = null;
-
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-
         if (registrationId.equals("google")) {
             log.info("인증수단 : google ");
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
