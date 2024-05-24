@@ -4,11 +4,11 @@ import java.util.Map;
 
 
 public class GoogleMemberInfo implements OAuth2MemberInfo {
+    private final Map<String, Object> attributes;
+
     public GoogleMemberInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
-    private Map<String, Object> attributes;
-
 
     @Override
     public String getName() {

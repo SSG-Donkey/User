@@ -40,11 +40,13 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         } else if (registrationId.equals("kakao")) {
             log.info("인증수단 : kakao ");
             memberInfo = new KakaoMemberInfo(oAuth2User.getAttributes());
+
         }
 
         String email = memberInfo.getEmail();
 
-        log.info("사용자 정보 : " + memberInfo.getEmail());
+        log.info("사용자 Email : " + memberInfo.getEmail());
+        log.info("사용자 name : " + memberInfo.getName());
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
