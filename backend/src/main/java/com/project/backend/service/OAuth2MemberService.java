@@ -8,14 +8,17 @@ import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
 import com.project.backend.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import lombok.extern.java.Log;
 
 import java.util.Map;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class OAuth2MemberService extends DefaultOAuth2UserService {
@@ -34,13 +37,17 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         if (registrationId.equals("google")) {
+            log.info("인증수단 : google ");
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
 
         } else if (registrationId.equals("kakao")) {
+            log.info("인증수단 : kakao ");
             memberInfo = new KakaoMemberInfo(oAuth2User.getAttributes());
         }
 
         String email = memberInfo.getEmail();
+
+        log.info("사용자 정보 : " + memberInfo.getEmail());
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
