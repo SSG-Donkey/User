@@ -72,15 +72,6 @@ public class UserController {
             log.info("scope : " + user.getScope());
             log.info("-----------------------------------------------");
 
-            Map<String, Object> userInfo = kakaoAuthService.getUserInfo(user.getId_token());
-
-            if (userInfo != null) {
-                log.info("UserInfo 존재 : " + userInfo.toString());
-                String nickname = (String) userInfo.get("nickname");
-                String email = (String) userInfo.get("email");
-                log.info("nickname : " + nickname);
-                log.info("email : " + email);
-            }
             // 유저 정보가 db에 존재 하면 userService.logoin(), 없으면 userService.signup
             return null;
         }

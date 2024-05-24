@@ -1,5 +1,8 @@
 package com.project.backend.service;
 
+import com.project.backend.dto.GoogleMemberInfo;
+import com.project.backend.dto.KakaoMemberInfo;
+import com.project.backend.dto.OAuth2MemberInfo;
 import com.project.backend.entity.User;
 import com.project.backend.jwt.JwtUtil;
 import com.project.backend.repository.UserRepository;
@@ -23,9 +26,22 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        OAuth2MemberInfo memberInfo = null;
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String) attributes.get("email");
+        String name = null;
+
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
+        if (registrationId.equals("google")) {
+            memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
+
+        } else if (registrationId.equals("kakao")) {
+            memberInfo = new KakaoMemberInfo(oAuth2User.getAttributes());
+        }
+
+        String email = memberInfo.getEmail();
+
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
 

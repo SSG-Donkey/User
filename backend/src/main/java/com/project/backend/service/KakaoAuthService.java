@@ -59,18 +59,9 @@ public class KakaoAuthService {
         return response.getBody();
     }
 
-    // id_token에 있는 UserInfo 가져오기
-    public Map<String, Object> getUserInfo(String info) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey("6uBd61JFuIXArjlUPDaTdAma8suYgoA1")
-                .build()
-                .parseClaimsJws(info)
-                .getBody();
+    // AcccessToken으로 UserInfo 가져오기
+    public String getUserInfo(String info) {
 
-        Map<String, Object> userInfo = new HashMap<>();
-
-        userInfo.put("nickname", claims.get("nickname", String.class));
-        userInfo.put("email", claims.get("email", String.class));
-        return userInfo;
+        return "성공";
     }
 }
