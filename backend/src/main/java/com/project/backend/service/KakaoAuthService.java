@@ -1,9 +1,14 @@
 package com.project.backend.service;
 
 import com.project.backend.dto.KakaoUserDto;
+import com.project.backend.dto.LoginRequestDto;
+import com.project.backend.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,8 +24,8 @@ import java.util.Map;
 @Log
 public class KakaoAuthService {
 
-    // Token 및 UserInfo가져오기
-    public KakaoUserDto getUserInfo(String code) {
+    // Token 생성
+    public KakaoUserDto getUserToken(String code) {
 
         String host = "https://kauth.kakao.com/oauth/token";
         RestTemplate restTemplate = new RestTemplate();
@@ -36,7 +41,7 @@ public class KakaoAuthService {
         body.add("client_id", "bbdfe22726c4cbce4bb5020c4c988a3c");
         body.add("redirect_uri", "https://www.dangnagwi.store/user/kakaoAuth");
         body.add("code", code);
-        body.add("client_secret","6uBd61JFuIXArjlUPDaTdAma8suYgoA1");
+        body.add("client_secret", "6uBd61JFuIXArjlUPDaTdAma8suYgoA1");
         log.info("바디 : " + body);
 
         // header + body
@@ -52,5 +57,20 @@ public class KakaoAuthService {
         log.info("request Status : " + response.getStatusCode());
 
         return response.getBody();
+    }
+
+    // id_token에 있는 UserInfo 가져오기
+    public Map<String, Object> getUserInfo(String info) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey("6uBd61JFuIXArjlUPDaTdAma8suYgoA1")
+                .build()
+                .parseClaimsJws(info)
+                .getBody();
+
+        Map<String, Object> userInfo = new HashMap<>();
+
+        userInfo.put("nickname", claims.get("nickname", String.class));
+        userInfo.put("email", claims.get("email", String.class));
+        return userInfo;
     }
 }

@@ -4,7 +4,7 @@ package com.project.backend.controller;
 import com.project.backend.dto.*;
 import com.project.backend.service.KakaoAuthService;
 import com.project.backend.service.OAuth2MemberService;
-import com.project.backend.security.PrincipalDetails;
+
 import com.project.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,14 +15,14 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Map;
+
 
 @Tag(name = "userController", description = "유저관리 API")
 @RestController
@@ -59,32 +59,36 @@ public class UserController {
     // 카카오 로그인
     @GetMapping("/kakaoAuth")
     public String kakaoAuth(@RequestParam("code") String code) {
-
         if (code != null) {
             log.info("인가코드 존재 : " + code);
-            KakaoUserDto user = kakaoAuthService.getUserInfo(code);
+            KakaoUserDto user = kakaoAuthService.getUserToken(code);
+
             log.info("----------------- DTO -------------------------");
             log.info(user.toString());
             log.info("TokenType : " + user.getToken_type());
             log.info("AccessToken : " + user.getAccess_token());
             log.info("RefreshToken : " + user.getRefresh_token());
             log.info("id_token : " + user.getId_token());
-            log.info("scope : "+user.getScope());
+            log.info("scope : " + user.getScope());
             log.info("-----------------------------------------------");
-            return user.getId_token();
+
+            Map<String, Object> userInfo = kakaoAuthService.getUserInfo(user.getId_token());
+
+            if (userInfo != null) {
+                log.info("UserInfo 존재 : " + userInfo.toString());
+                String nickname = (String) userInfo.get("nickname");
+                String email = (String) userInfo.get("email");
+                log.info("nickname : " + nickname);
+                log.info("email : " + email);
+            }
+            // 유저 정보가 db에 존재 하면 userService.logoin(), 없으면 userService.signup
+            return null;
         }
-        return null;
-    }
 
-    // Token, 유저 정보 받아오기
-    @PostMapping("/kakaoLogin")
-    public SignupRequestDto kakaoLogin(HttpServletResponse response) {
-        // 유저 정보 에서 nick_name 받아와서 loaduser()
-        // 정보 없으면 createUser(profile_nickname, account_email)
-        log.info("kakao/login 진입");
 
         return null;
     }
+
 
     //회원정보 수정
     @Operation(summary = "회원 정보 업데이트 API", description = "사용자의 닉네임, 비밀번호, 및 은행 정보를 업데이트합니다.")
