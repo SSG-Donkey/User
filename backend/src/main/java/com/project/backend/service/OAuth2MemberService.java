@@ -49,6 +49,8 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, attributes));
 
+        log.info("user 정보 : " + user);
+
         // JWT 토큰 생성
         String token = jwtUtil.createToken(user);
 
