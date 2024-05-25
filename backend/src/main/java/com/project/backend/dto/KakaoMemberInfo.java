@@ -10,7 +10,7 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
     public KakaoMemberInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
         this.kakaoAccountAttributes = (Map<String, Object>) attributes.get("kakao_account");
-        this.profileAttributes = (Map<String, Object>) attributes.get("profile");
+        this.profileAttributes = (Map<String, Object>) attributes.get("properties");
 
     }
 
@@ -26,7 +26,7 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
 
     @Override
     public String getName() {
-        return kakaoAccountAttributes.get("nickname").toString();
+        return profileAttributes.get("nickname").toString();
     }
 
     @Override
