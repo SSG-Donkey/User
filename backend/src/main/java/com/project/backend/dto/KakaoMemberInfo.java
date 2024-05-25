@@ -3,9 +3,9 @@ package com.project.backend.dto;
 import java.util.Map;
 
 public class KakaoMemberInfo implements OAuth2MemberInfo {
-    private final Map<String, Object> attributes;
-    private final Map<String, Object> kakaoAccountAttributes;
-    private final Map<String, Object> profileAttributes;
+    private Map<String, Object> attributes;
+    private Map<String, Object> kakaoAccountAttributes;
+    private Map<String, Object> profileAttributes;
 
     public KakaoMemberInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
@@ -15,10 +15,19 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
     }
 
     @Override
+    public String getProviderId() {
+        return attributes.get("id").toString();
+    }
+
+    @Override
+    public String getProvider() {
+        return "kakao";
+    }
+
+    @Override
     public String getName() {
         return kakaoAccountAttributes.get("nickname").toString();
     }
-
 
     @Override
     public String getEmail() {
