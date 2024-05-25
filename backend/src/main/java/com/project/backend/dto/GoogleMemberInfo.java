@@ -10,15 +10,6 @@ public class GoogleMemberInfo implements OAuth2MemberInfo {
         this.attributes = attributes;
     }
 
-    @Override
-    public String getProviderId() {
-        return "";
-    }
-
-    @Override
-    public String getProvider() {
-        return "";
-    }
 
     @Override
     public String getName() {

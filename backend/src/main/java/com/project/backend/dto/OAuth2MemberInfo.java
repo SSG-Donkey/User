@@ -1,9 +1,7 @@
 package com.project.backend.dto;
 
 public interface OAuth2MemberInfo {
-    String getProviderId();
 
-    String getProvider();
 
     String getName();       // 사용자 이름    ex) 홍길동
 

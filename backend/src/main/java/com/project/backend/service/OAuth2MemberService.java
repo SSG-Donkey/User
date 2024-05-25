@@ -38,20 +38,22 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
             log.info("인증수단 : google ");
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
 
+
         } else if (registrationId.equals("kakao")) {
             log.info("인증수단 : kakao ");
             memberInfo = new KakaoMemberInfo(oAuth2User.getAttributes());
 
+
         }
 
         String email = memberInfo.getEmail();
+        String name = memberInfo.getName();
 
-        log.info("사용자 정보 : " + memberInfo);
-        log.info("사용자 accountAttribute : " + memberInfo.getName());
-        log.info("사용자 Email : " + memberInfo.getEmail());
+        log.info("사용자 Name : " + name);
+        log.info("사용자 Email : " + email);
 
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createUser(email, attributes));
+                .orElseGet(() -> createUser(email, name));
 
         log.info("user 정보 : " + user);
 
@@ -63,9 +65,9 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         return principalDetails;
     }
 
-    private User createUser(String email, Map<String, Object> attributes) {
+    private User createUser(String email, String name) {
         User user = new User(
-                (String) attributes.get("name"),
+                name,
                 email,
                 "",
                 email,
