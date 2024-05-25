@@ -32,6 +32,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         OAuth2MemberInfo memberInfo = null;
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("attributesMap : " + attributes);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         if (registrationId.equals("google")) {
             log.info("인증수단 : google ");
@@ -46,7 +47,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String email = memberInfo.getEmail();
 
         log.info("사용자 정보 : " + memberInfo);
-        log.info("사용자 attribute : " + memberInfo.getName());
+        log.info("사용자 accountAttribute : " + memberInfo.getName());
         log.info("사용자 Email : " + memberInfo.getEmail());
 
         User user = userRepository.findByEmail(email)
