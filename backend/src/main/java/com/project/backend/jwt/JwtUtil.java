@@ -61,6 +61,7 @@ public class JwtUtil {
                 .claim("email", user.getEmail())
                 .claim("account", user.getAccount())
                 .claim("bankNo", user.getBankNo())
+                .claim("username", user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_TIME))
                 .signWith(key, signatureAlgorithm)
